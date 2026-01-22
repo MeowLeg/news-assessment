@@ -1,0 +1,2479 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "默认模块",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [],
+  "paths": {
+    "/zscmscore/get_programs": {
+      "get": {
+        "summary": "获取节目列表",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": [
+                    {
+                      "code": "590f6b165afa45f1bd8fc1ed31756fb7",
+                      "id": 1,
+                      "media_type": 0,
+                      "name": "舟山新闻",
+                      "site_id": 0,
+                      "state": 1
+                    },
+                    {
+                      "code": "",
+                      "id": 2,
+                      "media_type": 1,
+                      "name": "舟山日报",
+                      "site_id": 1,
+                      "state": 1
+                    }
+                  ],
+                  "errMsg": "",
+                  "success": true
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/get_page_meta": {
+      "get": {
+        "summary": "过去报纸版面meta信息",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": [
+                    {
+                      "id": 1,
+                      "page_no": "日报1版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 2,
+                      "page_no": "日报2版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 3,
+                      "page_no": "日报3版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 4,
+                      "page_no": "日报4版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 5,
+                      "page_no": "日报5版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 6,
+                      "page_no": "日报6版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 7,
+                      "page_no": "日报7版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 8,
+                      "page_no": "日报8版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 9,
+                      "page_no": "日报1版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 10,
+                      "page_no": "日报2版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 11,
+                      "page_no": "日报3版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 12,
+                      "page_no": "日报4版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 13,
+                      "page_no": "日报5版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 14,
+                      "page_no": "日报6版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 15,
+                      "page_no": "日报7版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 16,
+                      "page_no": "日报8版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 17,
+                      "page_no": "日报1版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 18,
+                      "page_no": "日报2版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 19,
+                      "page_no": "日报3版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 20,
+                      "page_no": "日报4版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 21,
+                      "page_no": "日报5版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 22,
+                      "page_no": "日报6版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 23,
+                      "page_no": "日报7版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 24,
+                      "page_no": "日报8版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 25,
+                      "page_no": "日报1版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 26,
+                      "page_no": "日报2版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 27,
+                      "page_no": "日报3版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 28,
+                      "page_no": "日报4版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 29,
+                      "page_no": "日报5版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 30,
+                      "page_no": "日报6版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 31,
+                      "page_no": "日报7版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 32,
+                      "page_no": "日报8版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 33,
+                      "page_no": "日报1版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 34,
+                      "page_no": "日报2版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 35,
+                      "page_no": "日报3版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 36,
+                      "page_no": "日报4版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 37,
+                      "page_no": "日报5版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 38,
+                      "page_no": "日报6版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 39,
+                      "page_no": "日报7版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 40,
+                      "page_no": "日报8版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 41,
+                      "page_no": "日报1版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 42,
+                      "page_no": "日报2版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 43,
+                      "page_no": "日报3版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 44,
+                      "page_no": "日报4版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 45,
+                      "page_no": "日报5版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 46,
+                      "page_no": "日报6版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 47,
+                      "page_no": "日报7版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 48,
+                      "page_no": "日报8版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 49,
+                      "page_no": "日报1版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 50,
+                      "page_no": "日报2版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 51,
+                      "page_no": "日报3版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 52,
+                      "page_no": "日报4版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 53,
+                      "page_no": "日报5版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 54,
+                      "page_no": "日报6版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 55,
+                      "page_no": "日报7版",
+                      "paper_name": "舟山日报"
+                    },
+                    {
+                      "id": 56,
+                      "page_no": "日报8版",
+                      "paper_name": "舟山日报"
+                    }
+                  ],
+                  "errMsg": "页面元数据查询成功",
+                  "success": true
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/get_reporters": {
+      "get": {
+        "summary": "获取记者信息列表",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "account",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "jh",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionid",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "a296e66720bb4caf91be3a19e684a6e6",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": [
+                    {
+                      "id": 1,
+                      "name": "郑颖",
+                      "phone": "13515805716",
+                      "reporter_category_id": 1,
+                      "state": 1
+                    },
+                    {
+                      "id": 2,
+                      "name": "刘浩",
+                      "phone": "13957212033",
+                      "reporter_category_id": 2,
+                      "state": 1
+                    },
+                    {
+                      "id": 3,
+                      "name": "应科",
+                      "phone": "13957220330",
+                      "reporter_category_id": 2,
+                      "state": 1
+                    },
+                    {
+                      "id": 4,
+                      "name": "王晓东",
+                      "phone": "13705808058",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 5,
+                      "name": "姚凯乐",
+                      "phone": "13675801610",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 6,
+                      "name": "王涵真",
+                      "phone": "18758325356",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 7,
+                      "name": "方琦",
+                      "phone": "13675808986",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 8,
+                      "name": "何斌",
+                      "phone": "13655802060",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 9,
+                      "name": "吴娜娜",
+                      "phone": "18768054695",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 10,
+                      "name": "丛琳",
+                      "phone": "18768053875",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 11,
+                      "name": "林家豪",
+                      "phone": "15858067867",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 12,
+                      "name": "陈逸麟",
+                      "phone": "15268002714",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 13,
+                      "name": "沈磊",
+                      "phone": "13906802122",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 14,
+                      "name": "张磊",
+                      "phone": "13758015307",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 15,
+                      "name": "戎浩",
+                      "phone": "18768075350",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 16,
+                      "name": "宓妤霖",
+                      "phone": "18857074410",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 17,
+                      "name": "孙璐艳",
+                      "phone": "13656828839",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 18,
+                      "name": "刘凯",
+                      "phone": "15068004101",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 19,
+                      "name": "刘晓梦",
+                      "phone": "18358077610",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 20,
+                      "name": "邢楠",
+                      "phone": "19518062106",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 21,
+                      "name": "顾嘉昊",
+                      "phone": "13957215362",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 22,
+                      "name": "范家乐",
+                      "phone": "18768057594",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 23,
+                      "name": "王跃蒙",
+                      "phone": "15705805288",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 24,
+                      "name": "张曦",
+                      "phone": "13868212819",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 25,
+                      "name": "林增光",
+                      "phone": "13454080803",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 26,
+                      "name": "董武",
+                      "phone": "13616805794",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 27,
+                      "name": "陆炳",
+                      "phone": "13506805426",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 28,
+                      "name": "方圆",
+                      "phone": "13735005734",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 29,
+                      "name": "陈雨露",
+                      "phone": "18158021510",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 30,
+                      "name": "颜榕",
+                      "phone": "13705807071",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 31,
+                      "name": "金蒙兰",
+                      "phone": "17816548879",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 32,
+                      "name": "陶思源",
+                      "phone": "15905801002",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 33,
+                      "name": "董凌浩",
+                      "phone": "18358097270",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 34,
+                      "name": "陈妤",
+                      "phone": "13567678103",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 35,
+                      "name": "贺贤挺",
+                      "phone": "13905803220",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 36,
+                      "name": "徐祝君",
+                      "phone": "13567678029",
+                      "reporter_category_id": 1,
+                      "state": 1
+                    },
+                    {
+                      "id": 37,
+                      "name": "方智斌",
+                      "phone": "13758027657",
+                      "reporter_category_id": 2,
+                      "state": 1
+                    },
+                    {
+                      "id": 38,
+                      "name": "黄燕玲",
+                      "phone": "18205806204",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 39,
+                      "name": "虞仁珂",
+                      "phone": "13587049946",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 40,
+                      "name": "陈颖丹",
+                      "phone": "13666597116",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 41,
+                      "name": "张莉莉",
+                      "phone": "18768070934",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 42,
+                      "name": "葛高蓉",
+                      "phone": "17888835377",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 43,
+                      "name": "曹玲",
+                      "phone": "13515803971",
+                      "reporter_category_id": 1,
+                      "state": 1
+                    },
+                    {
+                      "id": 44,
+                      "name": "石艳虹",
+                      "phone": "15205803652",
+                      "reporter_category_id": 2,
+                      "state": 1
+                    },
+                    {
+                      "id": 45,
+                      "name": "邱波彤",
+                      "phone": "13567678038",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 46,
+                      "name": "何菁",
+                      "phone": "13857209872",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 47,
+                      "name": "翁雨薇",
+                      "phone": "13587086927",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 48,
+                      "name": "王倩倩",
+                      "phone": "13857221205",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 49,
+                      "name": "金春玲",
+                      "phone": "13957221970",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 50,
+                      "name": "汪超群",
+                      "phone": "15205804836",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 51,
+                      "name": "陈斌娜",
+                      "phone": "13867208818",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 52,
+                      "name": "朱丽媛",
+                      "phone": "13646808070",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    },
+                    {
+                      "id": 53,
+                      "name": "岑瑜",
+                      "phone": "13957215000",
+                      "reporter_category_id": 3,
+                      "state": 1
+                    }
+                  ],
+                  "errMsg": "记者列表数据获取成功",
+                  "success": true
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/get_articles": {
+      "get": {
+        "summary": "获取文章列表（带page）",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 2025,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 12,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 1,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 10,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "account",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "jh",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "636d70259f4643008d2062080d9973e2",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": {
+                    "articles": [
+                      {
+                        "id": 1,
+                        "page_meta_id": 0,
+                        "page_name": "",
+                        "publish_day": 1,
+                        "publish_month": 12,
+                        "publish_year": 2025,
+                        "score_action": 100,
+                        "score_basic": 450,
+                        "title": "【闪亮“十四五”·我的这五年】朱雨雷：见证舟山船舶产业“智” 变",
+                        "tv_or_paper": 0,
+                        "tv_url": "https://mc-public-kh.wifizs.cn/16290457183556_hd.mp4?width=1280&height=720&isVertical=0&fsize=50990685&duration=196.0"
+                      },
+                      {
+                        "id": 2,
+                        "page_meta_id": 0,
+                        "page_name": "",
+                        "publish_day": 1,
+                        "publish_month": 12,
+                        "publish_year": 2025,
+                        "score_action": 100,
+                        "score_basic": 300,
+                        "title": "我市各地学习贯彻党的二十届四中全会精神",
+                        "tv_or_paper": 0,
+                        "tv_url": "https://mc-public-kh.wifizs.cn/16290457183556_hd.mp4?width=1280&height=720&isVertical=0&fsize=50990685&duration=196.0"
+                      },
+                      {
+                        "id": 3,
+                        "page_meta_id": 0,
+                        "page_name": "",
+                        "publish_day": 1,
+                        "publish_month": 12,
+                        "publish_year": 2025,
+                        "score_action": 100,
+                        "score_basic": 300,
+                        "title": "普陀山国际机场启用综合服务中心 为入境旅客提供“一站式” 服务",
+                        "tv_or_paper": 0,
+                        "tv_url": "https://mc-public-kh.wifizs.cn/16290457183556_hd.mp4?width=1280&height=720&isVertical=0&fsize=50990685&duration=196.0"
+                      },
+                      {
+                        "id": 4,
+                        "page_meta_id": 0,
+                        "page_name": "",
+                        "publish_day": 1,
+                        "publish_month": 12,
+                        "publish_year": 2025,
+                        "score_action": 100,
+                        "score_basic": 300,
+                        "title": "监管部门“亮码入企” 执法全程留痕可溯",
+                        "tv_or_paper": 0,
+                        "tv_url": "https://mc-public-kh.wifizs.cn/16290457183556_hd.mp4?width=1280&height=720&isVertical=0&fsize=50990685&duration=196.0"
+                      },
+                      {
+                        "id": 5,
+                        "page_meta_id": 0,
+                        "page_name": "",
+                        "publish_day": 1,
+                        "publish_month": 12,
+                        "publish_year": 2025,
+                        "score_action": 100,
+                        "score_basic": 300,
+                        "title": "嵊泗海关优化服务 助贻贝“游”向世界餐桌",
+                        "tv_or_paper": 0,
+                        "tv_url": "https://mc-public-kh.wifizs.cn/16290457183556_hd.mp4?width=1280&height=720&isVertical=0&fsize=50990685&duration=196.0"
+                      },
+                      {
+                        "id": 6,
+                        "page_meta_id": 0,
+                        "page_name": "",
+                        "publish_day": 1,
+                        "publish_month": 12,
+                        "publish_year": 2025,
+                        "score_action": 100,
+                        "score_basic": 300,
+                        "title": "2025年中国飞镖公开赛（浙江舟山站）开赛",
+                        "tv_or_paper": 0,
+                        "tv_url": "https://mc-public-kh.wifizs.cn/16290457183556_hd.mp4?width=1280&height=720&isVertical=0&fsize=50990685&duration=196.0"
+                      },
+                      {
+                        "id": 7,
+                        "page_meta_id": 0,
+                        "page_name": "",
+                        "publish_day": 1,
+                        "publish_month": 12,
+                        "publish_year": 2025,
+                        "score_action": 100,
+                        "score_basic": 300,
+                        "title": "全市职工定向徒步活动举行",
+                        "tv_or_paper": 0,
+                        "tv_url": "https://mc-public-kh.wifizs.cn/16290457183556_hd.mp4?width=1280&height=720&isVertical=0&fsize=50990685&duration=196.0"
+                      },
+                      {
+                        "id": 8,
+                        "page_meta_id": 0,
+                        "page_name": "",
+                        "publish_day": 1,
+                        "publish_month": 12,
+                        "publish_year": 2025,
+                        "score_action": 100,
+                        "score_basic": 300,
+                        "title": "【我的乡创新天地】李洁：以咖啡香为引 打开创意新空间",
+                        "tv_or_paper": 0,
+                        "tv_url": "https://mc-public-kh.wifizs.cn/16290457183556_hd.mp4?width=1280&height=720&isVertical=0&fsize=50990685&duration=196.0"
+                      },
+                      {
+                        "id": 9,
+                        "page_meta_id": 0,
+                        "page_name": "",
+                        "publish_day": 1,
+                        "publish_month": 12,
+                        "publish_year": 2025,
+                        "score_action": 100,
+                        "score_basic": 300,
+                        "title": "国家地理标志赋能 定海皋泄香柚销售旺",
+                        "tv_or_paper": 0,
+                        "tv_url": "https://mc-public-kh.wifizs.cn/16290457183556_hd.mp4?width=1280&height=720&isVertical=0&fsize=50990685&duration=196.0"
+                      },
+                      {
+                        "id": 10,
+                        "page_meta_id": 0,
+                        "page_name": "",
+                        "publish_day": 1,
+                        "publish_month": 12,
+                        "publish_year": 2025,
+                        "score_action": 100,
+                        "score_basic": 300,
+                        "title": "11月1日起国产小客车新车上牌全程数字化办理",
+                        "tv_or_paper": 0,
+                        "tv_url": "https://mc-public-kh.wifizs.cn/16290457183556_hd.mp4?width=1280&height=720&isVertical=0&fsize=50990685&duration=196.0"
+                      }
+                    ],
+                    "total": 23
+                  },
+                  "errMsg": "",
+                  "success": true
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/get_reporter_events": {
+      "get": {
+        "summary": "获取记者业务得分",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "reporter_id",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "2025",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "12",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": [
+                    {
+                      "content": "XX杀人事件",
+                      "id": 1,
+                      "publish_day": 1,
+                      "publish_month": 12,
+                      "publish_year": 2025,
+                      "reporter_id": 1,
+                      "score": 300,
+                      "score_from": "记者"
+                    }
+                  ],
+                  "errMsg": "",
+                  "success": true
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/calc_monthly": {
+      "get": {
+        "summary": "获取记者阅读总分列表",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "2025",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "12",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": [
+                    {
+                      "event_score": 300,
+                      "id": 1,
+                      "name": "郑颖",
+                      "phone": "13515805716",
+                      "reporter_category_id": 1,
+                      "reporter_category_name": "主任",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 300,
+                      "id": 2,
+                      "name": "刘浩",
+                      "phone": "13957212033",
+                      "reporter_category_id": 2,
+                      "reporter_category_name": "副主任",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 300,
+                      "id": 3,
+                      "name": "应科",
+                      "phone": "13957220330",
+                      "reporter_category_id": 2,
+                      "reporter_category_name": "副主任",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 300,
+                      "id": 4,
+                      "name": "王晓东",
+                      "phone": "13705808058",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 300,
+                      "id": 5,
+                      "name": "姚凯乐",
+                      "phone": "13675801610",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 300,
+                      "id": 6,
+                      "name": "王涵真",
+                      "phone": "18758325356",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 300,
+                      "id": 7,
+                      "name": "方琦",
+                      "phone": "13675808986",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 8,
+                      "name": "何斌",
+                      "phone": "13655802060",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 9,
+                      "name": "吴娜娜",
+                      "phone": "18768054695",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 10,
+                      "name": "丛琳",
+                      "phone": "18768053875",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 11,
+                      "name": "林家豪",
+                      "phone": "15858067867",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 12,
+                      "name": "陈逸麟",
+                      "phone": "15268002714",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 13,
+                      "name": "沈磊",
+                      "phone": "13906802122",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 14,
+                      "name": "张磊",
+                      "phone": "13758015307",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 15,
+                      "name": "戎浩",
+                      "phone": "18768075350",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 16,
+                      "name": "宓妤霖",
+                      "phone": "18857074410",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 17,
+                      "name": "孙璐艳",
+                      "phone": "13656828839",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 18,
+                      "name": "刘凯",
+                      "phone": "15068004101",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 19,
+                      "name": "刘晓梦",
+                      "phone": "18358077610",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 20,
+                      "name": "邢楠",
+                      "phone": "19518062106",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 21,
+                      "name": "顾嘉昊",
+                      "phone": "13957215362",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 22,
+                      "name": "范家乐",
+                      "phone": "18768057594",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 23,
+                      "name": "王跃蒙",
+                      "phone": "15705805288",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 24,
+                      "name": "张曦",
+                      "phone": "13868212819",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 25,
+                      "name": "林增光",
+                      "phone": "13454080803",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 26,
+                      "name": "董武",
+                      "phone": "13616805794",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 27,
+                      "name": "陆炳",
+                      "phone": "13506805426",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 28,
+                      "name": "方圆",
+                      "phone": "13735005734",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 29,
+                      "name": "陈雨露",
+                      "phone": "18158021510",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 30,
+                      "name": "颜榕",
+                      "phone": "13705807071",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 31,
+                      "name": "金蒙兰",
+                      "phone": "17816548879",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 32,
+                      "name": "陶思源",
+                      "phone": "15905801002",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 33,
+                      "name": "董凌浩",
+                      "phone": "18358097270",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 34,
+                      "name": "陈妤",
+                      "phone": "13567678103",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 35,
+                      "name": "贺贤挺",
+                      "phone": "13905803220",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 36,
+                      "name": "徐祝君",
+                      "phone": "13567678029",
+                      "reporter_category_id": 1,
+                      "reporter_category_name": "主任",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 37,
+                      "name": "方智斌",
+                      "phone": "13758027657",
+                      "reporter_category_id": 2,
+                      "reporter_category_name": "副主任",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 38,
+                      "name": "黄燕玲",
+                      "phone": "18205806204",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 39,
+                      "name": "虞仁珂",
+                      "phone": "13587049946",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 40,
+                      "name": "陈颖丹",
+                      "phone": "13666597116",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 41,
+                      "name": "张莉莉",
+                      "phone": "18768070934",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 42,
+                      "name": "葛高蓉",
+                      "phone": "17888835377",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 43,
+                      "name": "曹玲",
+                      "phone": "13515803971",
+                      "reporter_category_id": 1,
+                      "reporter_category_name": "主任",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 44,
+                      "name": "石艳虹",
+                      "phone": "15205803652",
+                      "reporter_category_id": 2,
+                      "reporter_category_name": "副主任",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 45,
+                      "name": "邱波彤",
+                      "phone": "13567678038",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 46,
+                      "name": "何菁",
+                      "phone": "13857209872",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 47,
+                      "name": "翁雨薇",
+                      "phone": "13587086927",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 48,
+                      "name": "王倩倩",
+                      "phone": "13857221205",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 49,
+                      "name": "金春玲",
+                      "phone": "13957221970",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 50,
+                      "name": "汪超群",
+                      "phone": "15205804836",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 51,
+                      "name": "陈斌娜",
+                      "phone": "13867208818",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 52,
+                      "name": "朱丽媛",
+                      "phone": "13646808070",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    },
+                    {
+                      "event_score": 0,
+                      "id": 53,
+                      "name": "岑瑜",
+                      "phone": "13957215000",
+                      "reporter_category_id": 3,
+                      "reporter_category_name": "文字记者",
+                      "subtotal_score": 0,
+                      "total_score": 0
+                    }
+                  ],
+                  "errMsg": "",
+                  "success": true
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/reporter": {
+      "post": {
+        "summary": "新建或更新、删除记者信息",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "account",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "jh",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionid",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "a296e66720bb4caf91be3a19e684a6e6",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "id": 1,
+                "name": "郑颖",
+                "phone": "13515805716",
+                "reporter_category_id": 1,
+                "department": "采访部",
+                "state": 1
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": 1,
+                  "errMsg": "更新成功",
+                  "success": true
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/article": {
+      "post": {
+        "summary": "新建、更新或删除文章",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "id": null,
+                "title": "测试文章1",
+                "tv_or_paper": 0,
+                "publish_year": 2025,
+                "publish_month": 12,
+                "publish_day": 28,
+                "tv_url": "https://mc-public-kh.wifizs.cn/16290457183556_hd.mp4?width=1280&height=720&isVertical=0&fsize=50990685&duration=196.0",
+                "page_meta_id": 0,
+                "page_name": "",
+                "state": 1
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": 24,
+                  "errMsg": "文章新建成功",
+                  "success": true
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/event": {
+      "post": {
+        "summary": "新建、更新或删除记者业务事件",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "reporter_id": 30,
+                "content": "雪国列车事件333",
+                "publish_year": 2025,
+                "publish_month": 12,
+                "score": 30,
+                "score_from": "文化公司",
+                "state": 1
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": 8,
+                  "errMsg": "新建成功",
+                  "success": true
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/score": {
+      "post": {
+        "summary": "打分",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "article_id": 1,
+                "score_basic": 300,
+                "score_action": 100,
+                "reporter_scores": [
+                  {
+                    "reporter_id": 11,
+                    "score": 200
+                  },
+                  {
+                    "reporter_id": 12,
+                    "score": 200
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": "",
+                  "errMsg": "操作成功",
+                  "success": true
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/get_event_scores": {
+      "get": {
+        "summary": "获取记者事件得分列表",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "reporter_id",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 30,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 2025,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 12,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": [],
+                  "errMsg": "查询成功",
+                  "success": true
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/get_cooperation_scores": {
+      "get": {
+        "summary": "获取记者业务协同列表",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "reporter_id",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "30",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "2025",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "12",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": [],
+                  "errMsg": "查询成功",
+                  "success": true
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/get_monthly_add_score": {
+      "get": {
+        "summary": "获取记者月度加分",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "reporter_id",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 30,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 2025,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 12,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": {
+                    "id": 0,
+                    "publish_month": 0,
+                    "publish_year": 0,
+                    "reason": "",
+                    "reporter_id": 0,
+                    "score": 0,
+                    "score_from": "",
+                    "state": 0
+                  },
+                  "errMsg": "查询成功",
+                  "success": true
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/get_monthly_sub_score": {
+      "get": {
+        "summary": "获取记者月度扣罚分数",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "reporter_id",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "13",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "2025",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "12",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": {
+                    "id": 0,
+                    "publish_month": 0,
+                    "publish_year": 0,
+                    "reason": "",
+                    "reporter_id": 0,
+                    "score": 0,
+                    "score_from": "",
+                    "state": 0
+                  },
+                  "errMsg": "查询成功",
+                  "success": true
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/cooperation": {
+      "post": {
+        "summary": "新建、更新或删除业务协作",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "id": null,
+                "reporter_id": 30,
+                "content": "雪国列车事件XXXX",
+                "publish_year": 2025,
+                "publish_month": 12,
+                "score": 30,
+                "score_from": "晚报",
+                "state": 1
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": 1,
+                  "errMsg": "新建成功",
+                  "success": true
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/monthly_add_score": {
+      "post": {
+        "summary": "新建、更新或删除记者月度加分",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "reporter_id": 30,
+                "reason": "雪国列车事件XXXX",
+                "publish_year": 2025,
+                "publish_month": 12,
+                "score": 30,
+                "state": 1
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功",
+                    "value": {
+                      "data": 1,
+                      "errMsg": "操作成功",
+                      "success": true
+                    }
+                  },
+                  "2": {
+                    "summary": "成功",
+                    "value": {
+                      "data": 1,
+                      "errMsg": "操作成功",
+                      "success": true
+                    }
+                  },
+                  "3": {
+                    "summary": "成功",
+                    "value": {
+                      "data": 1,
+                      "errMsg": "操作成功",
+                      "success": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/monthly_sub_score": {
+      "post": {
+        "summary": "新建、更新或删除记者月度扣罚",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "reporter_id": 30,
+                "reason": "雪国列车事件XXXX_sub",
+                "publish_year": 2025,
+                "publish_month": 12,
+                "score": 10,
+                "state": 1
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": 1,
+                  "errMsg": "插入成功",
+                  "success": true
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/login": {
+      "post": {
+        "summary": "登录",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "name": "jh",
+                "password": "Jh2044695"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "example": {
+                  "data": {
+                    "id": 1,
+                    "name": "jh",
+                    "session_id": "c5d390479c5b4c7ca8b7d6052b3a933c"
+                  },
+                  "errMsg": "account data got",
+                  "success": true
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/zscmscore/get_reporter_categories": {
+      "get": {
+        "summary": "获取记者工种分类",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "account",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "jh",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionid",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "a296e66720bb4caf91be3a19e684a6e6",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功",
+                    "value": {
+                      "data": [
+                        {
+                          "id": 1,
+                          "name": "主任"
+                        },
+                        {
+                          "id": 2,
+                          "name": "副主任"
+                        },
+                        {
+                          "id": 3,
+                          "name": "文字记者"
+                        },
+                        {
+                          "id": 4,
+                          "name": "摄像记者"
+                        },
+                        {
+                          "id": 5,
+                          "name": "摄影记者"
+                        },
+                        {
+                          "id": 6,
+                          "name": "主持人"
+                        },
+                        {
+                          "id": 7,
+                          "name": "通讯员"
+                        }
+                      ],
+                      "errMsg": "获取记者分类成功",
+                      "success": true
+                    }
+                  },
+                  "2": {
+                    "summary": "成功",
+                    "value": {
+                      "data": [
+                        {
+                          "id": 1,
+                          "name": "主任"
+                        },
+                        {
+                          "id": 2,
+                          "name": "副主任"
+                        },
+                        {
+                          "id": 3,
+                          "name": "文字记者"
+                        },
+                        {
+                          "id": 4,
+                          "name": "摄像记者"
+                        },
+                        {
+                          "id": 5,
+                          "name": "摄影记者"
+                        },
+                        {
+                          "id": 6,
+                          "name": "主持人"
+                        },
+                        {
+                          "id": 7,
+                          "name": "通讯员"
+                        }
+                      ],
+                      "errMsg": "获取记者分类成功",
+                      "success": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "responses": {},
+    "securitySchemes": {}
+  },
+  "servers": [],
+  "security": []
+}

@@ -1,0 +1,60 @@
+/* 表格样式 - 增强隔行对比 */
+
+/* 表格行基础样式 */
+.el-table__row {
+  /* 基础行背景色 */
+  background-color: #ffffff !important;
+  /* 过渡效果 */
+  transition: background-color 0.2s ease;
+}
+
+/* 表格隔行着色 - 合适的对比 */
+.el-table__body .el-table__row:nth-child(even) {
+  /* 偶数行使用合适的灰色，确保选择器优先级 */
+  background-color: #f0f0f0 !important;
+}
+
+/* 确保条纹行样式被正确应用 */
+.el-table--striped .el-table__body tr.el-table__row--striped td {
+  background-color: #f0f0f0 !important;
+}
+
+/* 表格行悬停效果 */
+.el-table__body tr:hover > td {
+  /* 悬停行背景色 */
+  background-color: #e8f4fc !important;
+}
+
+/* 表格表头样式 */
+.el-table__header-wrapper th {
+  /* 表头背景色 */
+  background-color: #fafafa !important;
+  /* 表头字体加粗 */
+  font-weight: 600 !important;
+  /* 表头文字颜色 */
+  color: #262626 !important;
+  /* 表头边框 */
+  border-bottom: 1px solid #e8e8e8 !important;
+}
+
+/* 表格单元格边框 */
+.el-table__body td {
+  /* 单元格边框 */
+  border-bottom: 1px solid #f0f0f0 !important;
+}
+
+/* 表格整体样式 */
+.el-table {
+  /* 表格边框 */
+  border: 1px solid #e8e8e8 !important;
+  /* 表格圆角 */
+  border-radius: 2px !important;
+  /* 表格阴影 */
+  box-shadow: none !important;
+}
+
+/* 表格内容区域 */
+.el-table__inner-wrapper {
+  /* 表格内容区域边框 */
+  border-radius: 2px !important;
+}
