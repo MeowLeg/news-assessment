@@ -17,33 +17,24 @@
       </div>
     </div>
     
-    <!-- 视频播放区 -->
-    <el-dialog
-      v-model="videoDialogVisible"
-      :title="currentVideoTitle || '视频播放'"
-      width="80%"
-      center
-      @close="handleVideoDialogClose"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-    >
-      <div class="video-container">
-        <video 
-          ref="videoPlayer" 
-          v-if="currentVideoUrl" 
-          controls 
-          autoplay 
-          style="width: 100%; height: auto; max-height: 600px;"
-        >
-          <source :src="currentVideoUrl" type="video/mp4">
-          您的浏览器不支持视频播放
-        </video>
-        <div v-else class="no-video">暂无视频URL</div>
+    <!-- 视频播放区 - 完全按照设计图实现 -->
+    <div class="video-modal-mask" :class="{ show: videoDialogVisible }" @click="handleVideoModalClick">
+      <div class="video-modal" @click.stop>
+        <button class="modal-close" @click="closeVideoModal">×</button>
+        <div class="video-container">
+          <video 
+            ref="videoPlayer" 
+            v-if="currentVideoUrl" 
+            controls 
+            autoplay 
+          >
+            <source :src="currentVideoUrl" type="video/mp4">
+            您的浏览器不支持视频播放
+          </video>
+          <div v-else class="no-video">暂无视频URL</div>
+        </div>
       </div>
-      <template #footer>
-        <el-button @click="videoDialogVisible = false">关闭</el-button>
-      </template>
-    </el-dialog>
+    </div>
     
     <!-- 电子报展示区 -->
     <el-dialog
@@ -184,6 +175,11 @@
       </el-table-column>
       <el-table-column prop="title" label="新闻标题" min-width="200" />
       <el-table-column prop="publishDate" label="发布日期" width="120" />
+      <el-table-column label="媒体" width="120">
+        <template #default="scope">
+          {{ scope.row.program_name || '未知媒体' }}
+        </template>
+      </el-table-column>
       <el-table-column prop="textReporter" label="文字记者" width="150" />
       <el-table-column prop="photoReporter" label="摄影记者" width="150" />
       <el-table-column prop="baseScore" label="基本分" width="100">
@@ -432,7 +428,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import * as XLSX from 'xlsx'
 import dayjs from 'dayjs'
@@ -734,6 +730,13 @@ const calculateRemainingScore = (row) => {
   return articleTotal - reportersTotal
 }
 
+// ESC键处理函数
+const handleEscapeKey = (e) => {
+  if (e.key === 'Escape' && videoDialogVisible.value) {
+    closeVideoModal()
+  }
+}
+
 // 初始化月份选项
 onMounted(async () => {
   // 生成近12个月的选项
@@ -765,6 +768,14 @@ onMounted(async () => {
   await fetchReporters()
   const [year, month] = selectedMonth.value.split('-').map(Number)
   await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null)
+  
+  // 添加ESC键事件监听器
+  document.addEventListener('keydown', handleEscapeKey)
+})
+
+// 清理事件监听器
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleEscapeKey)
 })
 
 // 方法：打开新增弹窗
@@ -902,6 +913,7 @@ const openTvUrl = (tvUrl, title = '') => {
     currentVideoUrl.value = tvUrl
     currentVideoTitle.value = title
     videoDialogVisible.value = true
+    document.body.style.overflow = 'hidden' // 禁止背景滚动
   }
 }
 
@@ -926,8 +938,8 @@ const openHtmlContentDialog = (row) => {
   }
 }
 
-// 方法：处理视频弹窗关闭事件
-const handleVideoDialogClose = () => {
+// 关闭视频弹窗
+const closeVideoModal = () => {
   // 停止视频播放
   if (videoPlayer.value) {
     videoPlayer.value.pause()
@@ -937,6 +949,20 @@ const handleVideoDialogClose = () => {
   // 重置视频相关状态
   currentVideoUrl.value = ''
   currentVideoTitle.value = ''
+  videoDialogVisible.value = false
+  document.body.style.overflow = 'auto' // 恢复背景滚动
+}
+
+// 处理视频弹窗外部点击
+const handleVideoModalClick = (e) => {
+  if (e.target === e.currentTarget) {
+    closeVideoModal()
+  }
+}
+
+// 方法：处理视频弹窗关闭事件
+const handleVideoDialogClose = () => {
+  closeVideoModal()
 }
 
 // 方法：处理电子报弹窗关闭事件
@@ -1079,16 +1105,91 @@ const changeMonth = async (val) => {
   margin-bottom: 10px;
 }
 
-.video-container {
+/* 蒙版样式 - 完全按照设计图实现 */
+.video-modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease-out;
+}
+
+.video-modal-mask.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* 弹出框主体 - 完全按照设计图实现 */
+.video-modal {
+  width: 900px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  overflow: hidden;
+  transform: scale(0.95);
+  transition: transform 0.3s ease-out;
+  position: relative;
+}
+
+.video-modal-mask.show .video-modal {
+  transform: scale(1);
+}
+
+/* 关闭按钮 - 完全按照设计图实现 */
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.1);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  z-index: 10;
+}
+
+.modal-close:hover {
+  background: rgba(0,0,0,0.3);
+}
+
+/* 视频容器 - 完全按照设计图实现 */
+.video-container {
+  width: 100%;
+  height: 506px; /* 16:9 比例：900/16*9=506.25 */
+}
+
+.video-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .no-video {
   text-align: center;
-  padding: 20px;
+  padding: 40px 20px;
   color: #999;
+  background: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+  font-size: 16px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .paper-container {
@@ -1096,12 +1197,26 @@ const changeMonth = async (val) => {
   justify-content: center;
   align-items: center;
   height: 700px;
+  background: #fafafa;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e8e8e8;
+}
+
+.paper-container iframe {
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .no-paper {
   text-align: center;
-  padding: 20px;
+  padding: 40px 20px;
   color: #999;
+  background: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+  font-size: 16px;
 }
 
 .html-content-container {

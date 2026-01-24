@@ -147,6 +147,7 @@ export const fetchArticles = async (year = 2025, month = 12, page = 1, limit = 2
               tv_or_paper: article.tv_or_paper, // program_id
               program_id: article.tv_or_paper, // 
               media_type: article.media_type, // 默认为电视
+              program_name: article.program_name || '', // 默认为电视
               paper_url: article.paper_url,
               page_name: article.page_name,
               page_meta_id: article.page_meta_id,
