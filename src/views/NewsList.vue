@@ -61,24 +61,19 @@
       </template>
     </el-dialog>
     
-    <!-- HTML内容展示弹窗 -->
-    <el-dialog
-      v-model="htmlContentDialogVisible"
-      :title="currentHtmlContentTitle || '内容查看'"
-      width="90%"
-      center
-      @close="handleHtmlContentDialogClose"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-    >
-      <div class="html-content-container">
-        <div v-if="currentHtmlContent" class="html-content" v-html="currentHtmlContent"></div>
-        <div v-else class="no-content">暂无内容</div>
+    <!-- HTML内容展示弹窗 - 自定义样式 -->
+    <div class="html-modal-mask" :class="{ show: htmlContentDialogVisible }" @click="handleHtmlModalClick">
+      <div class="html-modal" @click.stop>
+        <button class="modal-close" @click="closeHtmlModal">×</button>
+        <div class="html-modal-header">
+          <h3>{{ currentHtmlContentTitle || '文稿内容' }}</h3>
+        </div>
+        <div class="html-modal-content">
+          <div v-if="currentHtmlContent" class="html-content" v-html="currentHtmlContent"></div>
+          <div v-else class="no-content">暂无内容</div>
+        </div>
       </div>
-      <template #footer>
-        <el-button @click="htmlContentDialogVisible = false">关闭</el-button>
-      </template>
-    </el-dialog>
+    </div>
     
     <!-- 记者选择弹窗 -->
     <el-dialog
@@ -175,14 +170,14 @@
           {{ (currentPage - 1) * pageSize + scope.$index + 1 }}
         </template>
       </el-table-column>
-      <el-table-column prop="title" label="新闻标题" min-width="200" />
-      <el-table-column prop="publishDate" label="发布日期" width="120" />
+      <el-table-column prop="title" label="新闻标题" min-width="350" />
+      <el-table-column prop="publishDate" label="发布日期" width="100" />
       <el-table-column label="媒体" width="120">
         <template #default="scope">
           {{ scope.row.program_name || '未知媒体' }}
         </template>
       </el-table-column>
-      <el-table-column prop="character_count" label="参考字数" width="120">
+      <el-table-column prop="character_count" label="参考字数" width="90">
         <template #default="scope">
           <span class="highlight-character-count">
             {{ typeof scope.row.character_count === 'number' ? scope.row.character_count.toLocaleString() : '0' }}
@@ -191,27 +186,27 @@
       </el-table-column>
       <el-table-column prop="textReporter" label="文字记者" width="150" />
       <el-table-column prop="photoReporter" label="摄影记者" width="150" />
-      <el-table-column prop="baseScore" label="基本分" width="100">
+      <el-table-column prop="baseScore" label="基本分" width="80">
         <template #default="scope">
           {{ typeof scope.row.baseScore === 'number' ? Math.round(scope.row.baseScore) : '0' }}
         </template>
       </el-table-column>
-      <el-table-column prop="executeScore" label="执行分" width="100">
+      <el-table-column prop="executeScore" label="执行分" width="80">
         <template #default="scope">
           {{ typeof scope.row.executeScore === 'number' ? Math.round(scope.row.executeScore) : '0' }}
         </template>
       </el-table-column>
-      <!-- <el-table-column prop="bonus" label="加分项" width="100">
+      <!-- <el-table-column prop="bonus" label="加分项" width="80">
         <template #default="scope">
           {{ typeof scope.row.bonus === 'number' ? Math.round(scope.row.bonus) : '0' }}
         </template>
       </el-table-column>
-      <el-table-column prop="penalty" label="扣分项" width="100">
+      <el-table-column prop="penalty" label="扣分项" width="80">
         <template #default="scope">
           {{ typeof scope.row.penalty === 'number' ? Math.round(scope.row.penalty) : '0' }}
         </template>
       </el-table-column> -->
-      <el-table-column prop="totalScore" label="总分" width="100">
+      <el-table-column prop="totalScore" label="总分" width="80">
         <template #default="scope">
           <span :class="{ 'text-danger': typeof scope.row.totalScore === 'number' && scope.row.totalScore < 0 }">
             {{ typeof scope.row.totalScore === 'number' ? Math.round(scope.row.totalScore) : '0' }}
@@ -231,7 +226,7 @@
           </div>
         </template>
       </el-table-column> -->
-      <el-table-column label="操作" width="320">
+      <el-table-column label="操作" width="280">
         <template #default="scope">
           <el-button size="small" type="primary" @click="openEditDialog(scope.row)">打分</el-button>
           <!-- 用于展示电视新闻或报纸新闻的链接 -->
@@ -746,8 +741,12 @@ const calculateRemainingScore = (row) => {
 
 // ESC键处理函数
 const handleEscapeKey = (e) => {
-  if (e.key === 'Escape' && videoDialogVisible.value) {
-    closeVideoModal()
+  if (e.key === 'Escape') {
+    if (videoDialogVisible.value) {
+      closeVideoModal()
+    } else if (htmlContentDialogVisible.value) {
+      closeHtmlModal()
+    }
   }
 }
 
@@ -980,6 +979,21 @@ const handleVideoDialogClose = () => {
   closeVideoModal()
 }
 
+// 关闭HTML内容弹窗
+const closeHtmlModal = () => {
+  // 重置HTML内容相关状态
+  currentHtmlContent.value = ''
+  currentHtmlContentTitle.value = ''
+  htmlContentDialogVisible.value = false
+}
+
+// 处理HTML弹窗外部点击
+const handleHtmlModalClick = (e) => {
+  if (e.target === e.currentTarget) {
+    closeHtmlModal()
+  }
+}
+
 // 方法：处理电子报弹窗关闭事件
 const handlePaperDialogClose = () => {
   // 重置电子报相关状态
@@ -989,9 +1003,7 @@ const handlePaperDialogClose = () => {
 
 // 方法：处理HTML内容弹窗关闭事件
 const handleHtmlContentDialogClose = () => {
-  // 重置HTML内容相关状态
-  currentHtmlContent.value = ''
-  currentHtmlContentTitle.value = ''
+  closeHtmlModal()
 }
 
 // 方法：导出Excel
@@ -1191,6 +1203,67 @@ const changeMonth = async (val) => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* HTML内容弹窗 - 自定义样式 */
+.html-modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease-out;
+}
+
+.html-modal-mask.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.html-modal {
+  width: 90%;
+  max-width: 1200px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  overflow: hidden;
+  transform: scale(0.95);
+  transition: transform 0.3s ease-out;
+  position: relative;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.html-modal-mask.show .html-modal {
+  transform: scale(1);
+}
+
+.html-modal-header {
+  padding: 20px;
+  border-bottom: 1px solid #e8e8e8;
+  background: #fafafa;
+}
+
+.html-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.html-modal-content {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(90vh - 120px);
 }
 
 .no-video {

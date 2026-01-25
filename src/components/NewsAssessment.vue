@@ -47,31 +47,31 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column prop="title" label="新闻标题" min-width="200" />
+      <el-table-column prop="title" label="新闻标题" min-width="350" />
       <el-table-column prop="publishDate" label="发布日期" width="120" />
       <el-table-column prop="textReporter" label="文字记者" width="150" />
       <el-table-column prop="photoReporter" label="摄影记者" width="150" />
-      <el-table-column prop="baseScore" label="基本分" width="100">
+      <el-table-column prop="baseScore" label="基本分" width="80">
         <template #default="scope">
           {{ scope.row.baseScore.toFixed(1) }}
         </template>
       </el-table-column>
-      <el-table-column prop="executeScore" label="执行分" width="100">
+      <el-table-column prop="executeScore" label="执行分" width="80">
         <template #default="scope">
           {{ scope.row.executeScore.toFixed(1) }}
         </template>
       </el-table-column>
-      <el-table-column prop="bonus" label="加分项" width="100">
+      <el-table-column prop="bonus" label="加分项" width="80">
         <template #default="scope">
           {{ scope.row.bonus.toFixed(1) }}
         </template>
       </el-table-column>
-      <el-table-column prop="penalty" label="扣分项" width="100">
+      <el-table-column prop="penalty" label="扣分项" width="80">
         <template #default="scope">
           {{ scope.row.penalty.toFixed(1) }}
         </template>
       </el-table-column>
-      <el-table-column prop="totalScore" label="总分" width="100">
+      <el-table-column prop="totalScore" label="总分" width="80">
         <template #default="scope">
           <span :class="{ 'text-danger': scope.row.totalScore < 0 }">
             {{ scope.row.totalScore.toFixed(1) }}
