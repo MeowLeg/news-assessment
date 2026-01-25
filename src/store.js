@@ -153,6 +153,7 @@ export const fetchArticles = async (year = 2025, month = 12, page = 1, limit = 2
               page_meta_id: article.page_meta_id,
               state: article.state,
               html_content: article.html_content || '',
+              character_count: article.character_count || 0,
             }
             
             console.log('转换后的文章:', transformedArticle)

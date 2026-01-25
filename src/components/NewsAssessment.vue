@@ -13,7 +13,9 @@
           />
         </el-select>
         <el-button type="primary" icon="Plus" @click="openAddDialog">新增新闻评分</el-button>
-        <el-button type="success" icon="Download" @click="exportToExcel">导出Excel</el-button>
+        <el-tooltip content="仅导出当前页面数据" placement="top">
+          <el-button type="success" icon="Download" @click="exportToExcel">导出Excel</el-button>
+        </el-tooltip>
       </div>
     </div>
 

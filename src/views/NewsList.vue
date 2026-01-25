@@ -13,7 +13,9 @@
           />
         </el-select>
         <el-button type="primary" icon="Plus" @click="openAddDialog">新增新闻评分</el-button>
-        <el-button type="success" icon="Download" @click="exportToExcel">导出Excel</el-button>
+        <el-tooltip content="仅导出当前页面数据" placement="top">
+          <el-button type="success" icon="Download" @click="exportToExcel">导出Excel</el-button>
+        </el-tooltip>
       </div>
     </div>
     
@@ -180,6 +182,13 @@
           {{ scope.row.program_name || '未知媒体' }}
         </template>
       </el-table-column>
+      <el-table-column prop="character_count" label="参考字数" width="120">
+        <template #default="scope">
+          <span class="highlight-character-count">
+            {{ typeof scope.row.character_count === 'number' ? scope.row.character_count.toLocaleString() : '0' }}
+          </span>
+        </template>
+      </el-table-column>
       <el-table-column prop="textReporter" label="文字记者" width="150" />
       <el-table-column prop="photoReporter" label="摄影记者" width="150" />
       <el-table-column prop="baseScore" label="基本分" width="100">
@@ -224,7 +233,7 @@
       </el-table-column> -->
       <el-table-column label="操作" width="320">
         <template #default="scope">
-          <el-button size="small" type="primary" @click="openEditDialog(scope.row)">编辑</el-button>
+          <el-button size="small" type="primary" @click="openEditDialog(scope.row)">打分</el-button>
           <!-- 用于展示电视新闻或报纸新闻的链接 -->
           <el-button 
             v-if="scope.row.media_type === 0"
@@ -365,6 +374,9 @@
         </el-form-item>
         <el-form-item label="电子报URL" prop="paper_url">
           <el-input v-model="newsForm.paper_url" placeholder="请输入电子报URL" />
+        </el-form-item>
+        <el-form-item label="参考字数">
+          <div style="font-size: 14px; color: #606266;">{{ newsForm.character_count || 0 }}</div>
         </el-form-item>
         <el-form-item label="基本分" prop="baseScore">
           <el-input
@@ -830,6 +842,7 @@ const openEditDialog = (row) => {
     photoReporters: row.reporter_scores.filter(item => item.reporter_category_id === 4 || item.reporter_category_id === 5),
     page_name: row.page_name || '',
     page_meta_id: row.page_meta_id || 0,
+    character_count: row.character_count || 0,
   })
   dialogVisible.value = true
 }
@@ -1283,6 +1296,12 @@ const changeMonth = async (val) => {
 
 .text-danger {
   color: #f56c6c;
+}
+
+/* 高亮的参考字数 */
+.highlight-character-count {
+  color: #409eff;
+  font-weight: bold;
 }
 
 /* 表格行剩余分数样式 */
