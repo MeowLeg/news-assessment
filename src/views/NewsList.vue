@@ -244,7 +244,7 @@
             size="small" 
             type="info" 
             @click="openHtmlContentDialog(scope.row)"
-          >查看</el-button>
+          >文稿</el-button>
           <el-button 
             type="warning" 
             size="small" 
