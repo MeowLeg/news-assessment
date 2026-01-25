@@ -227,13 +227,13 @@
           <el-button size="small" type="primary" @click="openEditDialog(scope.row)">编辑</el-button>
           <!-- 用于展示电视新闻或报纸新闻的链接 -->
           <el-button 
-            v-if="scope.row.media_type === 0 && scope.row.tv_url"
+            :disabled="!(scope.row.media_type === 0 && scope.row.tv_url)"
             size="small" 
             type="info" 
             @click="openTvUrl(scope.row.tv_url, scope.row.title)"
           >播放</el-button>
           <el-button 
-            v-if="scope.row.media_type === 1 && scope.row.paper_url"
+            :disabled="!(scope.row.media_type === 1 && scope.row.paper_url)"
             size="small" 
             type="info" 
             @click="openPaperUrl(scope.row.paper_url, scope.row.title)"
