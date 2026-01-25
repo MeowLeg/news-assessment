@@ -227,17 +227,19 @@
           <el-button size="small" type="primary" @click="openEditDialog(scope.row)">编辑</el-button>
           <!-- 用于展示电视新闻或报纸新闻的链接 -->
           <el-button 
-            :disabled="!(scope.row.media_type === 0 && scope.row.tv_url)"
+            v-if="scope.row.media_type === 0"
+            :disabled="!scope.row.tv_url"
             size="small" 
             type="info" 
             @click="openTvUrl(scope.row.tv_url, scope.row.title)"
           >播放</el-button>
           <el-button 
-            :disabled="!(scope.row.media_type === 1 && scope.row.paper_url)"
+            v-if="scope.row.media_type === 1"
+            :disabled="!scope.row.paper_url"
             size="small" 
             type="info" 
             @click="openPaperUrl(scope.row.paper_url, scope.row.title)"
-          >显示</el-button>
+          >电子报</el-button>
           <el-button 
             size="small" 
             type="info" 
@@ -897,7 +899,7 @@ const submitForm = async () => {
     
     // 刷新文章列表
     const [year, month] = selectedMonth.value.split('-').map(Number)
-    await fetchArticles(year, month)
+    await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null)
     
     ElMessage.success(isEdit.value ? '编辑成功' : '新增成功')
     dialogVisible.value = false
