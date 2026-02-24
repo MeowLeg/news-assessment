@@ -100,9 +100,9 @@
             style="width: 100%"
             @selection-change="handleReporterSelectionChange"
           >
-          <el-table-column type="selection" width="55" />
-          <el-table-column prop="name" label="记者姓名" width="150" />
-          <el-table-column prop="category_name" label="记者类型" width="150" />
+          <el-table-column type="selection" width="100" />
+          <el-table-column prop="name" label="记者姓名" width="350" />
+          <!-- <el-table-column prop="category_name" label="记者类型" width="150" /> -->
           </el-table>
         </div>
       </div>
@@ -149,6 +149,7 @@
           :value="reporter.id"
         />
       </el-select>
+      <el-checkbox v-model="filterCorrespondent" style="margin-right: 10px">通讯员</el-checkbox>
       <el-button type="primary" icon="Search" @click="handleSearch">查询</el-button>
     </div>
 
@@ -453,6 +454,7 @@ const searchKeyword = ref('')
 const filterReporter = ref('')
 const filterReporterId = ref('0') // 0 表示全部记者
 const filterMediaType = ref('0') // 0 表示全部媒体
+const filterCorrespondent = ref(false) // 是否只显示通讯员
 
 // 节目列表（媒体类型）
 const programs = ref([])
@@ -717,7 +719,7 @@ const handleSearch = async () => {
   currentPage.value = 1 // 搜索时回到第一页
   // 重新获取数据，将搜索关键词和筛选条件传递给后端
   const [year, month] = selectedMonth.value.split('-').map(Number)
-  await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value: null, filterMediaType.value)
+  await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value: null, filterMediaType.value, filterCorrespondent.value)
 }
 
 // 计算表格行中文章的剩余可分配分数
@@ -780,7 +782,7 @@ onMounted(async () => {
   // 获取初始数据
   await fetchReporters()
   const [year, month] = selectedMonth.value.split('-').map(Number)
-  await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null)
+  await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value)
   
   // 添加ESC键事件监听器
   document.addEventListener('keydown', handleEscapeKey)
@@ -911,7 +913,7 @@ const submitForm = async () => {
     
     // 刷新文章列表
     const [year, month] = selectedMonth.value.split('-').map(Number)
-    await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null)
+    await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value)
     
     ElMessage.success(isEdit.value ? '编辑成功' : '新增成功')
     dialogVisible.value = false
@@ -1038,14 +1040,14 @@ const handleSizeChange = async (val) => {
   currentPage.value = 1 // 切换每页条数时，回到第一页
   // 重新获取数据，传递搜索关键词和筛选条件
   const [year, month] = selectedMonth.value.split('-').map(Number)
-  await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null)
+  await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value)
 }
 
 const handleCurrentChange = async (val) => {
   currentPage.value = val
   // 重新获取数据，传递搜索关键词和筛选条件
   const [year, month] = selectedMonth.value.split('-').map(Number)
-  await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null)
+  await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value)
 }
 
 // 删除文章
@@ -1066,7 +1068,7 @@ const deleteArticle = async (row) => {
     
     // 刷新文章列表
     const [year, month] = selectedMonth.value.split('-').map(Number)
-    await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null)
+    await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value)
     
     ElMessage.success('文章删除成功')
   } catch (err) {
@@ -1087,7 +1089,7 @@ const changeMonth = async (val) => {
   month.value = val
   currentPage.value = 1 // 切换月份时，回到第一页
   const [year, this_month] = val.split('-').map(Number)
-  await fetchArticles(year, this_month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null)
+  await fetchArticles(year, this_month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value)
   ElMessage.success(`已切换至${val}月份`)
 }
 </script>

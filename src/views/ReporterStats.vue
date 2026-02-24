@@ -250,7 +250,7 @@
               <div v-else>暂无数据</div>
             </template>
             <el-table-column prop="name" label="记者姓名" width="120" />
-            <el-table-column prop="type" label="参与类型" width="120" />
+            <!-- <el-table-column prop="type" label="参与类型" width="120" /> -->
             <el-table-column prop="count" label="新闻数量" width="100" />
             <el-table-column prop="newsTotal" label="新闻得分合计" width="120">
               <template #default="scope">
