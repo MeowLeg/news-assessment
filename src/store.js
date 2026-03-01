@@ -22,7 +22,7 @@ export const loading = ref(false)
 export const error = ref(null)
 
 // 从API获取文章列表
-export const fetchArticles = async (year = 2025, month = 12, page = 1, limit = 20, keyword = null, reporter_id = null, media_type = null) => {
+export const fetchArticles = async (year = 2025, month = 12, page = 1, limit = 20, keyword = null, reporter_id = null, media_type = null, is_collaboration = false) => {
   loading.value = true
   error.value = null
   try {
@@ -31,6 +31,8 @@ export const fetchArticles = async (year = 2025, month = 12, page = 1, limit = 2
     if (keyword) payload.keyword = keyword
     if (reporter_id) payload.reporter_id = reporter_id
     if (media_type) payload.tv_or_paper = media_type - 1
+    payload.is_collaboration = null;
+    if (is_collaboration) payload.is_collaboration = 1;
     const response = await api.getArticles(payload)
     console.log('API完整响应:', response)
     
@@ -126,6 +128,11 @@ export const fetchArticles = async (year = 2025, month = 12, page = 1, limit = 2
             ).reduce(
               (prev, curr) => (prev ? prev + ', ' : '') + curr.reporter_name + curr.score + '分', ''
             ) : ''
+            const correspondentReporters = article.reporter_scores && article.reporter_scores.length > 0 ? article.reporter_scores.filter(
+              score => score.reporter_category_id === 7
+            ).reduce(
+              (prev, curr) => (prev ? prev + ', ' : '') + curr.reporter_name + curr.score + '分', ''
+            ) : ''
             
             // 处理分数字段
             const scoreBasic = article.score_basic || article.baseScore || article.base_score || 0
@@ -137,6 +144,7 @@ export const fetchArticles = async (year = 2025, month = 12, page = 1, limit = 2
               publishDate: article.publishDate || article.date || `${article.publish_year || year}-${String(article.publish_month || month).padStart(2, '0')}-${String(article.publish_day || 1).padStart(2, '0')}`,
               textReporter: textReporter,
               photoReporter: photoReporter,
+              correspondentReporter: correspondentReporters,
               baseScore: typeof scoreBasic === 'number' ? Math.round(scoreBasic) : 0,
               executeScore: typeof scoreAction === 'number' ? Math.round(scoreAction) : 0,
               bonus: 0,
@@ -278,6 +286,7 @@ export const saveArticle = async (articleData) => {
       title: articleData.title || '',
       tv_or_paper: articleData.program_id || 0, // 应为program_id
       state: articleData.state, // 默认为启用状态
+      is_collaboration: articleData.is_collaboration || 0,
       // 只有在有publishDate时才解析日期字段
       ...(publishDate && {
         publish_year: parseInt(publishDate.split('-')[0]),

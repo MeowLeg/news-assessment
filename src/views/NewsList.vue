@@ -166,7 +166,7 @@
         <div v-if="error" class="error-message">{{ error }}</div>
         <div v-else>暂无数据</div>
       </template>
-      <el-table-column label="ID" width="80">
+      <el-table-column label="ID" width="50">
         <template #default="scope">
           {{ (currentPage - 1) * pageSize + scope.$index + 1 }}
         </template>
@@ -185,8 +185,9 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column prop="textReporter" label="文字记者" width="150" />
-      <el-table-column prop="photoReporter" label="摄影记者" width="150" />
+      <el-table-column prop="textReporter" label="文字记者" width="130" />
+      <el-table-column prop="photoReporter" label="摄影记者" width="130" />
+      <el-table-column prop="correspondentReporter" label="通讯员" width="130" />
       <el-table-column prop="baseScore" label="基本分" width="80">
         <template #default="scope">
           {{ typeof scope.row.baseScore === 'number' ? Math.round(scope.row.baseScore) : '0' }}
@@ -207,7 +208,7 @@
           {{ typeof scope.row.penalty === 'number' ? Math.round(scope.row.penalty) : '0' }}
         </template>
       </el-table-column> -->
-      <el-table-column prop="totalScore" label="总分" width="80">
+      <el-table-column prop="totalScore" label="总分" width="70">
         <template #default="scope">
           <span :class="{ 'text-danger': typeof scope.row.totalScore === 'number' && scope.row.totalScore < 0 }">
             {{ typeof scope.row.totalScore === 'number' ? Math.round(scope.row.totalScore) : '0' }}
@@ -343,12 +344,39 @@
             />
             <el-button 
               type="warning" 
-            size="small" 
-            @click="removeReporter('photo', index)"
-          >删除</el-button>
+              size="small" 
+              @click="removeReporter('photo', index)"
+            >删除</el-button>
           </div>
           <el-button type="primary" size="small" @click="addReporter('photo')" style="margin-top: 10px;">
             <el-icon><Plus /></el-icon> 添加摄影记者
+          </el-button>
+        </el-form-item>
+        
+        <!-- 通讯员 -->
+        <el-form-item label="通讯员">
+          <div v-for="(reporter, index) in newsForm.correspondentReporters" :key="'correspondent-' + index" class="reporter-item">
+            <el-input 
+              v-model="reporter.reporter_name" 
+              placeholder="请输入通讯员姓名" 
+              style="width: 200px; margin-right: 10px;"
+            />
+            <el-input-number 
+              v-model="reporter.score" 
+              :min="0" 
+              :max="1000" 
+              :precision="0" 
+              placeholder="分数" 
+              style="width: 120px; margin-right: 10px;"
+            />
+            <el-button 
+              type="warning" 
+              size="small" 
+              @click="removeReporter('correspondent', index)"
+            >删除</el-button>
+          </div>
+          <el-button type="primary" size="small" @click="addReporter('correspondent')" style="margin-top: 10px;">
+            <el-icon><Plus /></el-icon> 添加通讯员
           </el-button>
         </el-form-item>
         <el-form-item label="媒体类型" prop="program_id">
@@ -502,7 +530,7 @@ const filteredAvailableReporters = computed(() => {
 // 基本分选项
 const baseScoreOptions = ref([100, 200, 300, 450, 600])
 
-// 计算文字和摄像记者的得分合计
+// 计算文字、摄像记者和通讯员的得分合计
 const reportersTotalScore = computed(() => {
   let total = 0
   // 计算文字记者得分总和
@@ -511,6 +539,10 @@ const reportersTotalScore = computed(() => {
   })
   // 计算摄影记者得分总和（包括摄像记者和摄影记者）
   newsForm.photoReporters.forEach(reporter => {
+    total += parseInt(reporter.score) || 0
+  })
+  // 计算通讯员得分总和
+  newsForm.correspondentReporters.forEach(reporter => {
     total += parseInt(reporter.score) || 0
   })
   return total
@@ -561,6 +593,7 @@ const newsForm = reactive({
   // penalty: 0,
   textReporters: [], // 文字记者列表，每个元素包含name和score
   photoReporters: [], // 摄影记者列表，每个元素包含name和score
+  correspondentReporters: [], // 通讯员列表，每个元素包含name和score
   page_name: '', // 电子报名称
   page_meta_id: 0, // 电子报元ID
   state: 1,
@@ -590,7 +623,7 @@ const openReporterSelectDialog = async (type) => {
         category_name: reporter.category_name || reporter.reporter_category_name || '未知类型',
         id: reporter.id || reporter.reporter_id || 0,
         // category_id: reporter.reporter_category_id || 0
-        category_id: type === 'text' ? 3 : (newsForm.media_type === 0 ? 4 : 5)
+        category_id: type === 'text' ? 3 : (type === 'correspondent' ? 7 : (newsForm.media_type === 0 ? 4 : 5))
       }
     }
     return { name: '未知记者', category_name: '未知类型', id: 0 }
@@ -630,7 +663,15 @@ const confirmReporterSelection = () => {
     selectedReporters.value.forEach(reporter => {
       // 检查是否已经添加过该记者
       console.log("reporter", reporter)
-      const isExist = newsForm.textReporters.some(r => r.reporter_id === reporter.id)
+      let isExist = false
+      if (reporter.category_id === 3) {
+        isExist = newsForm.textReporters.some(r => r.reporter_id === reporter.id)
+      } else if (reporter.category_id === 4 || reporter.category_id === 5) {
+        isExist = newsForm.photoReporters.some(r => r.reporter_id === reporter.id)
+      } else if (reporter.category_id === 7) {
+        isExist = newsForm.correspondentReporters.some(r => r.reporter_id === reporter.id)
+      }
+      
       if (!isExist) {
         if (reporter.category_id === 3) {
           newsForm.textReporters.push({
@@ -656,6 +697,14 @@ const confirmReporterSelection = () => {
             reporter_category_id: 5, // 摄影记者类别
             reporter_category_name: '摄影记者'
           })
+        } else if (reporter.category_id === 7) {
+          newsForm.correspondentReporters.push({
+            reporter_name: reporter.name,
+            score: 0,
+            reporter_id: reporter.id || 0,
+            reporter_category_id: 7, // 通讯员类别
+            reporter_category_name: '通讯员'
+          })
         }
       }
     })
@@ -670,6 +719,8 @@ const removeReporter = (type, index) => {
     newsForm.textReporters.splice(index, 1)
   } else if (type === 'photo') {
     newsForm.photoReporters.splice(index, 1)
+  } else if (type === 'correspondent') {
+    newsForm.correspondentReporters.splice(index, 1)
   }
 }
 
@@ -719,7 +770,7 @@ const handleSearch = async () => {
   currentPage.value = 1 // 搜索时回到第一页
   // 重新获取数据，将搜索关键词和筛选条件传递给后端
   const [year, month] = selectedMonth.value.split('-').map(Number)
-  await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value: null, filterMediaType.value, filterCorrespondent.value)
+  await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value: null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value)
 }
 
 // 计算表格行中文章的剩余可分配分数
@@ -812,6 +863,7 @@ const openAddDialog = () => {
     // penalty: 0,
     textReporters: [],
     photoReporters: [],
+    correspondentReporters: [],
     page_name: '',
     page_meta_id: 0,
     state: 1,
@@ -841,6 +893,7 @@ const openEditDialog = (row) => {
     // photoReporters: row.photoReporter ? row.photoReporter.split(',').map(name => ({ name: name.trim(), score: 0 })) : [{ name: '', score: 0 }]
     textReporters: row.reporter_scores.filter(item => item.reporter_category_id === 3),
     photoReporters: row.reporter_scores.filter(item => item.reporter_category_id === 4 || item.reporter_category_id === 5),
+    correspondentReporters: row.reporter_scores.filter(item => item.reporter_category_id === 7),
     page_name: row.page_name || '',
     page_meta_id: row.page_meta_id || 0,
     character_count: row.character_count || 0,
@@ -874,6 +927,10 @@ const submitForm = async () => {
     newsForm.photoReporters.forEach(reporter => {
       reportersTotal += parseInt(reporter.score) || 0
     })
+    // 计算通讯员得分总和
+    newsForm.correspondentReporters.forEach(reporter => {
+      reportersTotal += parseInt(reporter.score) || 0
+    })
     
     // 转换记者数据格式为API预期格式
     const formData = {
@@ -882,7 +939,9 @@ const submitForm = async () => {
       executeScore: calculatedExecuteScore, // 使用自动计算的执行分
       textReporter: newsForm.textReporters.map(r => r.name).join(','),
       photoReporter: newsForm.photoReporters.map(r => r.name).join(','),
+      correspondentReporter: newsForm.correspondentReporters.map(r => r.name).join(','),
       publishDate: typeof newsForm.publishDate === 'string' ? newsForm.publishDate : dayjs(newsForm.publishDate).format('YYYY-MM-DD'),
+      is_collaboration: newsForm.correspondentReporters.length > 0 ? 1 : 0,
       // 准备reporter_scores数据
       reporter_scores: [
         ...newsForm.textReporters.map(r => ({
@@ -894,6 +953,11 @@ const submitForm = async () => {
           reporter_id: r.reporter_id,
           score: r.score, // 表单中的分数已经是整数
           reporter_category_id: newsForm.media_type === 0 ? 4 : 5, // tv_or_paper为0时摄影记者为4，反之为5
+        })),
+        ...newsForm.correspondentReporters.map(r => ({
+          reporter_id: r.reporter_id,
+          score: r.score, // 表单中的分数已经是整数
+          reporter_category_id: 7, // 通讯员为7
         })),
       ],
     }
