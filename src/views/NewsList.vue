@@ -185,19 +185,20 @@
           </span>
         </template>
       </el-table-column>
+      <el-table-column label="版号" width="80">
+        <template #default="scope">
+          {{ scope.row.page_meta_id !== 0 ? scope.row.page_meta_id : '' }}
+        </template>
+      </el-table-column>
+      <el-table-column label="版名" width="120">
+        <template #default="scope">
+          {{ scope.row.page_meta_id !== 0 ? scope.row.page_name : '' }}
+        </template>
+      </el-table-column>
       <el-table-column prop="textReporter" label="文字记者" width="130" />
       <el-table-column prop="photoReporter" label="摄影记者" width="130" />
       <el-table-column prop="correspondentReporter" label="通讯员" width="130" />
-      <el-table-column prop="baseScore" label="基本分" width="80">
-        <template #default="scope">
-          {{ typeof scope.row.baseScore === 'number' ? Math.round(scope.row.baseScore) : '0' }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="executeScore" label="执行分" width="80">
-        <template #default="scope">
-          {{ typeof scope.row.executeScore === 'number' ? Math.round(scope.row.executeScore) : '0' }}
-        </template>
-      </el-table-column>
+
       <!-- <el-table-column prop="bonus" label="加分项" width="80">
         <template #default="scope">
           {{ typeof scope.row.bonus === 'number' ? Math.round(scope.row.bonus) : '0' }}
