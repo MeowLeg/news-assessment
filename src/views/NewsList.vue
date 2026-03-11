@@ -822,6 +822,7 @@ onMounted(async () => {
   try {
     const response = await api.getPrograms()
     if (response.success && response.data) {
+      response.data.sort((a, b) => b.order_id - a.order_id)
       programs.value = response.data
     } else {
       ElMessage.warning('获取节目列表失败')
@@ -1161,7 +1162,7 @@ const changeMonth = async (val) => {
 
 <style scoped>
 .assessment-container {
-  max-width: 1600px;
+  max-width: 1800px;
   margin: 0 auto;
   padding: 20px;
 }
