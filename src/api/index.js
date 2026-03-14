@@ -69,8 +69,8 @@ const api = {
   },
 
   // 获取记者信息列表
-  getReporters() {
-    return apiClient.get('/zscmscore/get_reporters')
+  getReporters(params = {}) {
+    return apiClient.get('/zscmscore/get_reporters', { params })
   },
 
   // 获取文章列表（带分页）

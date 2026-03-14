@@ -61,25 +61,96 @@
       </template>
     </el-dialog>
     
-    <!-- HTML内容展示弹窗 - 自定义样式 -->
-    <div class="html-modal-mask" :class="{ show: htmlContentDialogVisible }" @click="handleHtmlModalClick">
-      <div class="html-modal" @click.stop>
-        <button class="modal-close" @click="closeHtmlModal">×</button>
-        <div class="html-modal-header">
-          <h3>{{ currentHtmlContentTitle || '文稿内容' }}</h3>
+
+    
+    <!-- 手机端详情弹窗 -->
+    <el-dialog
+      v-model="mobileDetailVisible"
+      title="新闻详情"
+      width="95%"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      class="mobile-detail-dialog"
+    >
+      <div v-if="currentMobileDetail" class="mobile-detail-content">
+        <div class="detail-item">
+          <span class="detail-label">新闻标题：</span>
+          <span class="detail-value">{{ currentMobileDetail.title }}</span>
         </div>
-        <div class="html-modal-content">
-          <div v-if="currentHtmlContent" class="html-content" v-html="currentHtmlContent"></div>
-          <div v-else class="no-content">暂无内容</div>
+        <div class="detail-item">
+          <span class="detail-label">发布日期：</span>
+          <span class="detail-value">{{ currentMobileDetail.publishDate }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">媒体：</span>
+          <span class="detail-value">{{ currentMobileDetail.program_name || '未知媒体' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">参考字数：</span>
+          <span class="detail-value highlight-character-count">
+            {{ typeof currentMobileDetail.character_count === 'number' ? currentMobileDetail.character_count.toLocaleString() : '0' }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">版号：</span>
+          <span class="detail-value">{{ currentMobileDetail.page_meta_id !== 0 ? currentMobileDetail.page_meta_id : '' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">版名：</span>
+          <span class="detail-value">{{ currentMobileDetail.page_meta_id !== 0 ? currentMobileDetail.page_name : '' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">文字记者：</span>
+          <span class="detail-value">{{ currentMobileDetail.textReporter }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">摄影记者：</span>
+          <span class="detail-value">{{ currentMobileDetail.photoReporter }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">通讯员：</span>
+          <span class="detail-value">{{ currentMobileDetail.correspondentReporter }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">总分：</span>
+          <span class="detail-value" :class="{ 'text-danger': typeof currentMobileDetail.totalScore === 'number' && currentMobileDetail.totalScore < 0 }">
+            {{ typeof currentMobileDetail.totalScore === 'number' ? Math.round(currentMobileDetail.totalScore) : '0' }}
+          </span>
         </div>
       </div>
-    </div>
+      <template #footer>
+        <div class="mobile-detail-actions">
+          <el-button type="primary" @click="openEditDialog(currentMobileDetail)">打分</el-button>
+          <el-button 
+            v-if="currentMobileDetail && currentMobileDetail.media_type === 0"
+            :disabled="!currentMobileDetail.tv_url"
+            type="info" 
+            @click="openTvUrl(currentMobileDetail.tv_url, currentMobileDetail.title)"
+          >播放</el-button>
+          <el-button 
+            v-if="currentMobileDetail && currentMobileDetail.media_type === 1"
+            :disabled="!currentMobileDetail.paper_url"
+            type="info" 
+            @click="openPaperUrl(currentMobileDetail.paper_url, currentMobileDetail.title)"
+          >电子报</el-button>
+          <el-button 
+            type="info" 
+            @click="openHtmlContentDialog(currentMobileDetail)"
+          >文稿</el-button>
+          <el-button 
+            type="warning" 
+            @click="deleteArticle(currentMobileDetail)"
+          >删除</el-button>
+          <el-button @click="mobileDetailVisible = false">关闭</el-button>
+        </div>
+      </template>
+    </el-dialog>
     
     <!-- 记者选择弹窗 -->
     <el-dialog
       v-model="reporterSelectDialogVisible"
       title="选择记者"
-      width="500px"
+      :width="isMobile ? '100%' : '500px'"
       @close="handleReporterSelectClose"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
@@ -154,13 +225,15 @@
     </div>
 
     <!-- 考核列表 -->
-    <div style="margin-top: 20px; display: flex; flex-direction: column; height: calc(100vh - 330px);">
+    <div class="news-list-container">
+      <!-- 桌面端表格 -->
       <el-table
         v-loading="loading"
         :data="newsList"
         border
         stripe
         style="width: 100%; flex: 1"
+        class="desktop-table"
       >
       <template #empty>
         <div v-if="error" class="error-message">{{ error }}</div>
@@ -216,6 +289,13 @@
           </span>
         </template>
       </el-table-column>
+      <el-table-column label="差额" width="100">
+        <template #default="scope">
+          <span :class="{ 'text-danger': typeof calculateScoreDifference(scope.row) === 'number' && calculateScoreDifference(scope.row) !== 0 }">
+            {{ calculateScoreDifference(scope.row) }}
+          </span>
+        </template>
+      </el-table-column>
       <!-- <el-table-column label="剩余分数" width="120">
         <template #default="scope">
           <div 
@@ -260,204 +340,412 @@
         </template>
       </el-table-column>
       </el-table>
+      
+      <!-- 手机端卡片列表 -->
+      <div class="mobile-card-list">
+        <div v v-loading="loading"></div>
+        <div v-if="newsList.length === 0" class="empty-message">
+          <div v-if="error" class="error-message">{{ error }}</div>
+          <div v-else>暂无数据</div>
+        </div>
+        <div 
+          v-for="(item, index) in newsList" 
+          :key="item.id" 
+          class="mobile-card"
+          @click="openMobileDetail(item)"
+        >
+          <div class="card-header">
+            <span class="card-index">{{ (currentPage - 1) * pageSize + index + 1 }}</span>
+            <span class="card-title">{{ item.title }}</span>
+          </div>
+          <div class="card-info">
+            <span class="info-item">{{ item.publishDate }}</span>
+            <span class="info-item">{{ item.program_name || '未知媒体' }}</span>
+            <span class="info-item score" :class="{ 'text-danger': typeof item.totalScore === 'number' && item.totalScore < 0 }">
+              {{ typeof item.totalScore === 'number' ? Math.round(item.totalScore) : '0' }}分
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- 分页 -->
-    <el-pagination
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="currentPage"
-      :page-sizes="[10, 20, 50, 9999]"
-      :page-size="pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="totalArticles"
-      style="margin-top: 20px; text-align: right"
-    >
-    </el-pagination>
+    <div class="pagination-container">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[10, 20, 50, 9999]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="totalArticles"
+        class="desktop-pagination"
+      >
+      </el-pagination>
+      <!-- 手机端自定义分页 -->
+      <div class="mobile-pagination">
+        <div class="mobile-pagination-content">
+          <button 
+            class="pagination-btn prev-btn" 
+            @click="handleCurrentChange(currentPage > 1 ? currentPage - 1 : 1)"
+            :disabled="currentPage === 1"
+          >
+            <span class="arrow">←</span>
+          </button>
+          <div class="pagination-numbers">
+            <button 
+              v-for="num in visiblePages" 
+              :key="num"
+              class="page-number"
+              :class="{ active: num === currentPage }"
+              @click="handleCurrentChange(num)"
+            >
+              {{ num }}
+            </button>
+          </div>
+          <button 
+            class="pagination-btn next-btn" 
+            @click="handleCurrentChange(currentPage < totalPages ? currentPage + 1 : totalPages)"
+            :disabled="currentPage === totalPages"
+          >
+            <span class="arrow">→</span>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- 新增/编辑弹窗 -->
     <el-dialog
       v-model="dialogVisible"
       :title="isEdit ? '编辑新闻评分' : '新增新闻评分'"
-      width="600px"
+      :width="isMobile ? '100%' : '600px'"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
+      class="score-dialog"
     >
-      <el-form
-        ref="newsFormRef"
-        :model="newsForm"
-        :rules="newsFormRules"
-        label-width="100px"
-      >
-        <el-form-item label="新闻标题" prop="title">
-          <el-input v-model="newsForm.title" placeholder="请输入新闻标题" />
-        </el-form-item>
-        <el-form-item label="发布日期" prop="publishDate">
-          <el-date-picker
-            v-model="newsForm.publishDate"
-            type="date"
-            placeholder="选择发布日期"
-            style="width: 100%"
-          />
-        </el-form-item>
-        <!-- 文字记者 -->
-        <el-form-item label="文字记者">
-          <div v-for="(reporter, index) in newsForm.textReporters" :key="'text-' + index" class="reporter-item">
-            <el-input 
-              v-model="reporter.reporter_name" 
-              placeholder="请输入记者姓名" 
-              style="width: 200px; margin-right: 10px;"
+      <!-- 桌面端布局 -->
+      <div v-if="!isMobile">
+        <el-form
+          ref="newsFormRef"
+          :model="newsForm"
+          :rules="newsFormRules"
+          label-width="100px"
+        >
+          <el-form-item label="新闻标题" prop="title">
+            <el-input v-model="newsForm.title" placeholder="请输入新闻标题" />
+          </el-form-item>
+          <el-form-item label="发布日期" prop="publishDate">
+            <el-date-picker
+              v-model="newsForm.publishDate"
+              type="date"
+              placeholder="选择发布日期"
+              style="width: 100%"
             />
-            <el-input-number 
-              v-model="reporter.score" 
-              :min="0" 
-              :max="1000" 
-              :precision="0" 
-              placeholder="分数" 
-              style="width: 120px; margin-right: 10px;"
-            />
-            <el-button 
-              type="warning" 
-            size="small" 
-            @click="removeReporter('text', index)"
-          >删除</el-button>
-          </div>
-          <el-button type="primary" size="small" @click="addReporter('text')" style="margin-top: 10px;">
-            <el-icon><Plus /></el-icon> 添加文字记者
-          </el-button>
-        </el-form-item>
-        
-        <!-- 摄影记者 -->
-        <el-form-item label="摄影记者">
-          <div v-for="(reporter, index) in newsForm.photoReporters" :key="'photo-' + index" class="reporter-item">
-            <el-input 
-              v-model="reporter.reporter_name" 
-              placeholder="请输入记者姓名" 
-              style="width: 200px; margin-right: 10px;"
-            />
-            <el-input-number 
-              v-model="reporter.score" 
-              :min="0" 
-              :max="1000" 
-              :precision="0" 
-              placeholder="分数" 
-              style="width: 120px; margin-right: 10px;"
-            />
-            <el-button 
-              type="warning" 
+          </el-form-item>
+          <!-- 文字记者 -->
+          <el-form-item label="文字记者">
+            <div v-for="(reporter, index) in newsForm.textReporters" :key="'text-' + index" class="reporter-item">
+              <el-input 
+                v-model="reporter.reporter_name" 
+                placeholder="请输入记者姓名" 
+                style="width: 200px; margin-right: 10px;"
+              />
+              <el-input-number 
+                v-model="reporter.score" 
+                :min="0" 
+                :max="1000" 
+                :precision="0" 
+                placeholder="分数" 
+                style="width: 120px; margin-right: 10px;"
+              />
+              <el-button 
+                type="warning" 
               size="small" 
-              @click="removeReporter('photo', index)"
+              @click="removeReporter('text', index)"
             >删除</el-button>
-          </div>
-          <el-button type="primary" size="small" @click="addReporter('photo')" style="margin-top: 10px;">
-            <el-icon><Plus /></el-icon> 添加摄影记者
-          </el-button>
-        </el-form-item>
-        
-        <!-- 通讯员 -->
-        <el-form-item label="通讯员">
-          <div v-for="(reporter, index) in newsForm.correspondentReporters" :key="'correspondent-' + index" class="reporter-item">
-            <el-input 
-              v-model="reporter.reporter_name" 
-              placeholder="请输入通讯员姓名" 
-              style="width: 200px; margin-right: 10px;"
+            </div>
+            <el-button type="primary" size="small" @click="addReporter('text')" style="margin-top: 10px;">
+              <el-icon><Plus /></el-icon> 添加文字记者
+            </el-button>
+          </el-form-item>
+          
+          <!-- 摄影记者 -->
+          <el-form-item label="摄影记者">
+            <div v-for="(reporter, index) in newsForm.photoReporters" :key="'photo-' + index" class="reporter-item">
+              <el-input 
+                v-model="reporter.reporter_name" 
+                placeholder="请输入记者姓名" 
+                style="width: 200px; margin-right: 10px;"
+              />
+              <el-input-number 
+                v-model="reporter.score" 
+                :min="0" 
+                :max="1000" 
+                :precision="0" 
+                placeholder="分数" 
+                style="width: 120px; margin-right: 10px;"
+              />
+              <el-button 
+                type="warning" 
+                size="small" 
+                @click="removeReporter('photo', index)"
+              >删除</el-button>
+            </div>
+            <el-button type="primary" size="small" @click="addReporter('photo')" style="margin-top: 10px;">
+              <el-icon><Plus /></el-icon> 添加摄影记者
+            </el-button>
+          </el-form-item>
+          
+          <!-- 通讯员 -->
+          <el-form-item label="通讯员">
+            <div v-for="(reporter, index) in newsForm.correspondentReporters" :key="'correspondent-' + index" class="reporter-item">
+              <el-input 
+                v-model="reporter.reporter_name" 
+                placeholder="请输入通讯员姓名" 
+                style="width: 200px; margin-right: 10px;"
+              />
+              <el-input-number 
+                v-model="reporter.score" 
+                :min="0" 
+                :max="1000" 
+                :precision="0" 
+                placeholder="分数" 
+                style="width: 120px; margin-right: 10px;"
+              />
+              <el-button 
+                type="warning" 
+                size="small" 
+                @click="removeReporter('correspondent', index)"
+              >删除</el-button>
+            </div>
+            <el-button type="primary" size="small" @click="addReporter('correspondent')" style="margin-top: 10px;">
+              <el-icon><Plus /></el-icon> 添加通讯员
+            </el-button>
+          </el-form-item>
+          <el-form-item label="媒体类型" prop="program_id">
+            <el-select
+              v-model="newsForm.program_id"
+              placeholder="请选择媒体类型"
+              style="width: 200px"
+            >
+              <el-option
+                v-for="program in programs"
+                :key="program.id"
+                :label="program.name"
+                :value="program.media_type"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="TV URL" prop="tv_url">
+            <el-input v-model="newsForm.tv_url" placeholder="请输入视频流地址" />
+          </el-form-item>
+          <el-form-item label="电子报URL" prop="paper_url">
+            <el-input v-model="newsForm.paper_url" placeholder="请输入电子报URL" />
+          </el-form-item>
+          <el-form-item label="参考字数">
+            <div style="font-size: 14px; color: #606266;">{{ newsForm.character_count || 0 }}</div>
+          </el-form-item>
+          <el-form-item label="基本分" prop="baseScore">
+            <el-input
+              v-model.number="newsForm.baseScore"
+              placeholder="请输入基本分"
+              style="width: 200px"
             />
-            <el-input-number 
-              v-model="reporter.score" 
-              :min="0" 
-              :max="1000" 
-              :precision="0" 
-              placeholder="分数" 
-              style="width: 120px; margin-right: 10px;"
+          </el-form-item>
+          <el-form-item label="执行分" prop="executeScore">
+            <el-input
+              v-model.number="newsForm.executeScore"
+              placeholder="请输入执行分"
+              style="width: 200px"
             />
-            <el-button 
-              type="warning" 
-              size="small" 
-              @click="removeReporter('correspondent', index)"
-            >删除</el-button>
-          </div>
-          <el-button type="primary" size="small" @click="addReporter('correspondent')" style="margin-top: 10px;">
-            <el-icon><Plus /></el-icon> 添加通讯员
-          </el-button>
-        </el-form-item>
-        <el-form-item label="媒体类型" prop="program_id">
-          <el-select
-            v-model="newsForm.program_id"
-            placeholder="请选择媒体类型"
-            style="width: 200px"
-          >
-            <el-option
-              v-for="program in programs"
-              :key="program.id"
-              :label="program.name"
-              :value="program.media_type"
+            <div style="margin-top: 5px; color: #999; font-size: 12px;">
+              记者得分合计 - 基本分
+            </div>
+          </el-form-item>
+          <el-form-item label="总分">
+            <el-input
+              v-model="totalScore"
+              disabled
+              style="width: 200px; color: #666"
             />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="TV URL" prop="tv_url">
-          <el-input v-model="newsForm.tv_url" placeholder="请输入视频流地址" />
-        </el-form-item>
-        <el-form-item label="电子报URL" prop="paper_url">
-          <el-input v-model="newsForm.paper_url" placeholder="请输入电子报URL" />
-        </el-form-item>
-        <el-form-item label="参考字数">
-          <div style="font-size: 14px; color: #606266;">{{ newsForm.character_count || 0 }}</div>
-        </el-form-item>
-        <el-form-item label="基本分" prop="baseScore">
-          <el-input
-            :value="autoCalculateBaseScore"
-            disabled
-            placeholder="根据记者得分自动计算"
-            style="width: 200px"
-          />
-          <div style="margin-top: 5px; color: #999; font-size: 12px;">
-            根据记者得分合计自动选择最接近的档位（100/200/300/450/600）
-          </div>
-        </el-form-item>
-        <el-form-item label="执行分" prop="executeScore">
-          <el-input
-            :value="autoCalculateExecuteScore"
-            disabled
-            placeholder="根据记者得分自动计算"
-            style="width: 200px"
-          />
-          <div style="margin-top: 5px; color: #999; font-size: 12px;">
-            记者得分合计 - 基本分
-          </div>
-        </el-form-item>
-        <!-- <el-form-item label="加分项" prop="bonus">
-          <el-input-number
-            v-model="newsForm.bonus"
-            :min="0"
-            :max="20"
-            :precision="0"
-            style="width: 200px"
-          />
-        </el-form-item>
-        <el-form-item label="扣分项" prop="penalty">
-          <el-input-number
-            v-model="newsForm.penalty"
-            :min="0"
-            :max="20"
-            :precision="0"
-            style="width: 200px"
-          />
-        </el-form-item> -->
-        <!-- 剩余可分配分数提示 -->
-        <!-- <el-form-item>
-          <div class="remaining-score" :class="{ 'high': remainingScore > 0, 'warning': remainingScore <= 0 }">
-            <span class="label">剩余可分配分数：</span>
-            <span class="value">{{ remainingScore }}</span>
-          </div>
-        </el-form-item> -->
-        <el-form-item label="总分">
-          <el-input
-            v-model="totalScore"
-            disabled
-            style="width: 200px; color: #666"
-          />
-        </el-form-item>
-      </el-form>
+          </el-form-item>
+          <el-form-item label="差额">
+            <el-input
+              :value="scoreDifference"
+              :style="{ width: '200px', color: scoreDifference > 0 ? '#f56c6c' : scoreDifference < 0 ? '#67c23a' : '#666' }"
+              disabled
+            />
+            <div style="margin-top: 5px; color: #999; font-size: 12px;">
+              总分 - 记者得分汇总
+            </div>
+          </el-form-item>
+        </el-form>
+      </div>
+      
+      <!-- 手机端布局 -->
+      <div v-else class="mobile-score-form">
+        <el-form
+          ref="newsFormRef"
+          :model="newsForm"
+          :rules="newsFormRules"
+        >
+          <el-form-item label="新闻标题" prop="title">
+            <el-input v-model="newsForm.title" placeholder="请输入新闻标题" />
+          </el-form-item>
+          <el-form-item label="发布日期" prop="publishDate">
+            <el-date-picker
+              v-model="newsForm.publishDate"
+              type="date"
+              placeholder="选择发布日期"
+              style="width: 100%"
+            />
+          </el-form-item>
+          <!-- 文字记者 -->
+          <el-form-item label="文字记者">
+            <div v-for="(reporter, index) in newsForm.textReporters" :key="'text-' + index" class="mobile-reporter-item">
+              <el-input 
+                v-model="reporter.reporter_name" 
+                placeholder="请输入记者姓名" 
+                style="width: 100%; margin-bottom: 5px;"
+              />
+              <div class="mobile-reporter-score">
+                <el-input-number 
+                  v-model="reporter.score" 
+                  :min="0" 
+                  :max="1000" 
+                  :precision="0" 
+                  placeholder="分数" 
+                  style="width: 100px; margin-right: 10px;"
+                />
+                <el-button 
+                  type="warning" 
+                  size="small" 
+                  @click="removeReporter('text', index)"
+                >删除</el-button>
+              </div>
+            </div>
+            <el-button type="primary" size="small" @click="addReporter('text')" style="margin-top: 10px;">
+              <el-icon><Plus /></el-icon> 添加文字记者
+            </el-button>
+          </el-form-item>
+          
+          <!-- 摄影记者 -->
+          <el-form-item label="摄影记者">
+            <div v-for="(reporter, index) in newsForm.photoReporters" :key="'photo-' + index" class="mobile-reporter-item">
+              <el-input 
+                v-model="reporter.reporter_name" 
+                placeholder="请输入记者姓名" 
+                style="width: 100%; margin-bottom: 5px;"
+              />
+              <div class="mobile-reporter-score">
+                <el-input-number 
+                  v-model="reporter.score" 
+                  :min="0" 
+                  :max="1000" 
+                  :precision="0" 
+                  placeholder="分数" 
+                  style="width: 100px; margin-right: 10px;"
+                />
+                <el-button 
+                  type="warning" 
+                  size="small" 
+                  @click="removeReporter('photo', index)"
+                >删除</el-button>
+              </div>
+            </div>
+            <el-button type="primary" size="small" @click="addReporter('photo')" style="margin-top: 10px;">
+              <el-icon><Plus /></el-icon> 添加摄影记者
+            </el-button>
+          </el-form-item>
+          
+          <!-- 通讯员 -->
+          <el-form-item label="通讯员">
+            <div v-for="(reporter, index) in newsForm.correspondentReporters" :key="'correspondent-' + index" class="mobile-reporter-item">
+              <el-input 
+                v-model="reporter.reporter_name" 
+                placeholder="请输入通讯员姓名" 
+                style="width: 100%; margin-bottom: 5px;"
+              />
+              <div class="mobile-reporter-score">
+                <el-input-number 
+                  v-model="reporter.score" 
+                  :min="0" 
+                  :max="1000" 
+                  :precision="0" 
+                  placeholder="分数" 
+                  style="width: 100px; margin-right: 10px;"
+                />
+                <el-button 
+                  type="warning" 
+                  size="small" 
+                  @click="removeReporter('correspondent', index)"
+                >删除</el-button>
+              </div>
+            </div>
+            <el-button type="primary" size="small" @click="addReporter('correspondent')" style="margin-top: 10px;">
+              <el-icon><Plus /></el-icon> 添加通讯员
+            </el-button>
+          </el-form-item>
+          <el-form-item label="媒体类型" prop="program_id">
+            <el-select
+              v-model="newsForm.program_id"
+              placeholder="请选择媒体类型"
+              style="width: 100%"
+            >
+              <el-option
+                v-for="program in programs"
+                :key="program.id"
+                :label="program.name"
+                :value="program.media_type"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="TV URL" prop="tv_url">
+            <el-input v-model="newsForm.tv_url" placeholder="请输入视频流地址" />
+          </el-form-item>
+          <el-form-item label="电子报URL" prop="paper_url">
+            <el-input v-model="newsForm.paper_url" placeholder="请输入电子报URL" />
+          </el-form-item>
+          <el-form-item label="参考字数">
+            <div style="font-size: 14px; color: #606266;">{{ newsForm.character_count || 0 }}</div>
+          </el-form-item>
+          <el-form-item label="基本分" prop="baseScore">
+            <el-input
+              v-model.number="newsForm.baseScore"
+              placeholder="请输入基本分"
+              style="width: 100%"
+            />
+          </el-form-item>
+          <el-form-item label="执行分" prop="executeScore">
+            <el-input
+              v-model.number="newsForm.executeScore"
+              placeholder="请输入执行分"
+              style="width: 100%"
+            />
+            <div style="margin-top: 5px; color: #999; font-size: 12px;">
+              记者得分合计 - 基本分
+            </div>
+          </el-form-item>
+          <el-form-item label="总分">
+            <el-input
+              v-model="totalScore"
+              disabled
+              style="width: 100%; color: #666"
+            />
+          </el-form-item>
+          <el-form-item label="差额">
+            <el-input
+              :value="scoreDifference"
+              :style="{ width: '100%', color: scoreDifference > 0 ? '#f56c6c' : scoreDifference < 0 ? '#67c23a' : '#666' }"
+              disabled
+            />
+            <div style="margin-top: 5px; color: #999; font-size: 12px;">
+              总分 - 记者得分汇总
+            </div>
+          </el-form-item>
+        </el-form>
+      </div>
+      
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="submitForm">确定</el-button>
@@ -473,6 +761,9 @@ import * as XLSX from 'xlsx'
 import dayjs from 'dayjs'
 import { newsList, totalArticles, allReporters, reporters, month, selectedMonth, monthOptions, fetchArticles, fetchReporters, saveArticle, scoreArticle, loading, error } from '../store.js'
 import api from '../api/index.js'
+
+// 移动设备检测
+const isMobile = ref(false)
 
 // 分页相关
 const currentPage = ref(1)
@@ -504,10 +795,7 @@ const paperDialogVisible = ref(false)
 const currentPaperUrl = ref('')
 const currentPaperTitle = ref('')
 
-// HTML内容展示弹窗相关
-const htmlContentDialogVisible = ref(false)
-const currentHtmlContent = ref('')
-const currentHtmlContentTitle = ref('')
+
 
 // 记者选择弹窗相关
 const reporterSelectDialogVisible = ref(false)
@@ -515,6 +803,35 @@ const currentReporterType = ref('') // 'text' 或 'photo'
 const selectedReporters = ref([]) // 当前选择的记者
 const allAvailableReporters = ref([]) // 所有可用记者列表
 const reporterSearchKeyword = ref('') // 记者搜索关键词
+
+// 手机端详情弹窗相关
+const mobileDetailVisible = ref(false)
+const currentMobileDetail = ref(null)
+
+// 分页相关计算属性
+const totalPages = computed(() => {
+  return Math.ceil(totalArticles.value / pageSize.value)
+})
+
+const visiblePages = computed(() => {
+  const pages = []
+  const total = totalPages.value
+  const current = currentPage.value
+  const pageCount = 3
+  
+  let start = Math.max(1, current - Math.floor(pageCount / 2))
+  let end = Math.min(total, start + pageCount - 1)
+  
+  if (end - start + 1 < pageCount) {
+    start = Math.max(1, end - pageCount + 1)
+  }
+  
+  for (let i = start; i <= end; i++) {
+    pages.push(i)
+  }
+  
+  return pages
+})
 
 // 筛选后的记者列表
 const filteredAvailableReporters = computed(() => {
@@ -549,33 +866,17 @@ const reportersTotalScore = computed(() => {
   return total
 })
 
-// 自动计算基本分：从100、200、300、450、600中找到最接近合计值的一档
-const autoCalculateBaseScore = computed(() => {
-  const total = reportersTotalScore.value
-  const options = [100, 200, 300, 450, 600]
-  
-  if (total <= 0) return 0
-  
-  // 找到最接近的值
-  let closest = options[0]
-  let minDiff = Math.abs(total - closest)
-  
-  for (let i = 1; i < options.length; i++) {
-    const diff = Math.abs(total - options[i])
-    if (diff < minDiff) {
-      minDiff = diff
-      closest = options[i]
-    }
-  }
-  
-  return closest
-})
-
-// 自动计算执行分：合计 - 基本分
+// 基本分和执行分现在可以手动输入，不再自动计算档次
 const autoCalculateExecuteScore = computed(() => {
   const total = reportersTotalScore.value
-  const base = autoCalculateBaseScore.value
+  const base = newsForm.baseScore || 0
   return Math.max(0, total - base)
+})
+
+// 计算总分和记者得分汇总的差额
+const scoreDifference = computed(() => {
+  const total = newsForm.baseScore + newsForm.executeScore
+  return total - reportersTotalScore.value
 })
 
 // 表单数据
@@ -793,6 +1094,25 @@ const calculateRemainingScore = (row) => {
   return articleTotal - reportersTotal
 }
 
+// 计算表格行中文章的总分和记者得分汇总的差额
+const calculateScoreDifference = (row) => {
+  // 文章总分：基本分+执行分
+  const articleTotal = (row.baseScore || 0) + (row.executeScore || 0)
+  
+  // 计算所有记者得分的总和
+  let reportersTotal = 0
+  
+  // 检查是否有reporter_scores字段
+  if (row.reporter_scores && Array.isArray(row.reporter_scores)) {
+    reportersTotal = row.reporter_scores.reduce((total, reporterScore) => {
+      return total + (parseInt(reporterScore.score) || 0)
+    }, 0)
+  }
+  
+  // 差额 = 文章总分 - 所有记者得分总和
+  return articleTotal - reportersTotal
+}
+
 // ESC键处理函数
 const handleEscapeKey = (e) => {
   if (e.key === 'Escape') {
@@ -804,8 +1124,16 @@ const handleEscapeKey = (e) => {
   }
 }
 
+// 检测移动设备
+const checkIsMobile = () => {
+  isMobile.value = window.innerWidth <= 768
+}
+
 // 初始化月份选项
 onMounted(async () => {
+  // 检测移动设备
+  checkIsMobile()
+  
   // 生成近12个月的选项
   const options = []
   for (let i = 0; i < 12; i++) {
@@ -839,12 +1167,21 @@ onMounted(async () => {
   
   // 添加ESC键事件监听器
   document.addEventListener('keydown', handleEscapeKey)
+  // 添加窗口大小变化监听器
+  window.addEventListener('resize', checkIsMobile)
 })
 
 // 清理事件监听器
 onUnmounted(() => {
   document.removeEventListener('keydown', handleEscapeKey)
+  window.removeEventListener('resize', checkIsMobile)
 })
+
+// 方法：打开手机端详情弹窗
+const openMobileDetail = (item) => {
+  currentMobileDetail.value = item
+  mobileDetailVisible.value = true
+}
 
 // 方法：打开新增弹窗
 const openAddDialog = () => {
@@ -908,9 +1245,9 @@ const submitForm = async () => {
   try {
     await newsFormRef.value.validate()
     
-    // 使用自动计算的基本分和执行分
-    const calculatedBaseScore = autoCalculateBaseScore.value
-    const calculatedExecuteScore = autoCalculateExecuteScore.value
+    // 直接使用表单中输入的基本分和执行分
+    const calculatedBaseScore = newsForm.baseScore || 0
+    const calculatedExecuteScore = newsForm.executeScore || 0
     
     // 计算文章总分：基本分+执行分
     const articleTotal = calculatedBaseScore + calculatedExecuteScore
@@ -1012,9 +1349,18 @@ const openPaperUrl = (paperUrl, title = '') => {
 // 方法：打开HTML内容弹窗
 const openHtmlContentDialog = (row) => {
   if (row.html_content) {
-    currentHtmlContent.value = row.html_content
-    currentHtmlContentTitle.value = row.title || '内容查看'
-    htmlContentDialogVisible.value = true
+    // 使用ElMessageBox替代自定义弹窗，自动管理z-index层级
+    ElMessageBox.alert(
+      `<div class="html-content">${row.html_content}</div>`,
+      row.title || '内容查看',
+      {
+        dangerouslyUseHTMLString: true,
+        customClass: 'html-content-dialog',
+        showConfirmButton: true,
+        confirmButtonText: '关闭',
+        center: true
+      }
+    )
   } else {
     ElMessage.warning('暂无内容')
   }
@@ -1047,31 +1393,11 @@ const handleVideoDialogClose = () => {
   closeVideoModal()
 }
 
-// 关闭HTML内容弹窗
-const closeHtmlModal = () => {
-  // 重置HTML内容相关状态
-  currentHtmlContent.value = ''
-  currentHtmlContentTitle.value = ''
-  htmlContentDialogVisible.value = false
-}
-
-// 处理HTML弹窗外部点击
-const handleHtmlModalClick = (e) => {
-  if (e.target === e.currentTarget) {
-    closeHtmlModal()
-  }
-}
-
 // 方法：处理电子报弹窗关闭事件
 const handlePaperDialogClose = () => {
   // 重置电子报相关状态
   currentPaperUrl.value = ''
   currentPaperTitle.value = ''
-}
-
-// 方法：处理HTML内容弹窗关闭事件
-const handleHtmlContentDialogClose = () => {
-  closeHtmlModal()
 }
 
 // 方法：导出Excel
@@ -1273,66 +1599,7 @@ const changeMonth = async (val) => {
   object-fit: cover;
 }
 
-/* HTML内容弹窗 - 自定义样式 */
-.html-modal-mask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease-out;
-}
 
-.html-modal-mask.show {
-  opacity: 1;
-  visibility: visible;
-}
-
-.html-modal {
-  width: 90%;
-  max-width: 1200px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-  overflow: hidden;
-  transform: scale(0.95);
-  transition: transform 0.3s ease-out;
-  position: relative;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.html-modal-mask.show .html-modal {
-  transform: scale(1);
-}
-
-.html-modal-header {
-  padding: 20px;
-  border-bottom: 1px solid #e8e8e8;
-  background: #fafafa;
-}
-
-.html-modal-header h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-}
-
-.html-modal-content {
-  padding: 20px;
-  overflow-y: auto;
-  flex: 1;
-  max-height: calc(90vh - 120px);
-}
 
 .no-video {
   text-align: center;
@@ -1407,6 +1674,61 @@ const changeMonth = async (val) => {
   color: #999;
 }
 
+/* HTML内容对话框样式 */
+.html-content-dialog {
+  max-height: 90vh !important;
+}
+
+/* PC端样式 - 保持原有宽高比，宽度明显大于高度 */
+@media (min-width: 769px) {
+  .html-content-dialog {
+    max-width: 90% !important;
+    width: 1200px !important;
+    max-height: 70vh !important;
+  }
+}
+
+/* 移动端样式 */
+@media (max-width: 768px) {
+  .html-content-dialog {
+    max-width: 95% !important;
+    max-height: 90vh !important;
+  }
+}
+
+.html-content-dialog .el-message-box__content {
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* PC端内容区域高度 */
+@media (min-width: 769px) {
+  .html-content-dialog .el-message-box__content {
+    max-height: 500px;
+  }
+}
+
+/* 移动端内容区域高度 */
+@media (max-width: 768px) {
+  .html-content-dialog .el-message-box__content {
+    max-height: 70vh;
+  }
+}
+
+.html-content-dialog .html-content {
+  line-height: 1.6;
+}
+
+.html-content-dialog .html-content :deep(div) {
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+.html-content-dialog .html-content :deep(p) {
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
 .remaining-score {
   padding: 10px;
   border-radius: 4px;
@@ -1461,4 +1783,796 @@ const changeMonth = async (val) => {
   background-color: #fef0f0;
   color: #f56c6c;
 }
+
+/* 手机端卡片列表样式 */
+.mobile-card-list {
+  display: none;
+}
+
+.mobile-card {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.mobile-card:hover {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.card-index {
+  background: #409eff;
+  color: #fff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #666;
+}
+
+.info-item {
+  flex-shrink: 0;
+}
+
+.info-item.score {
+  font-weight: bold;
+  color: #409eff;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+}
+
+/* 手机端详情弹窗样式 */
+  .mobile-detail-content {
+    padding: 10px 0;
+  }
+
+  .detail-item {
+    display: flex;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .detail-item:last-child {
+    border-bottom: none;
+  }
+
+  .detail-label {
+    font-weight: bold;
+    color: #333;
+    min-width: 100px;
+    flex-shrink: 0;
+  }
+
+  .detail-value {
+    color: #666;
+    flex: 1;
+    word-break: break-all;
+  }
+
+
+
+.mobile-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.mobile-detail-actions .el-button {
+  flex: 1;
+  min-width: 80px;
+}
+
+/* 分页容器样式 */
+.pagination-container {
+  margin-top: 20px;
+  width: 100%;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+/* 桌面端分页 */
+.desktop-pagination {
+  text-align: right;
+  width: 100%;
+}
+
+/* 手机端分页 */
+.mobile-pagination {
+  display: none;
+  text-align: center;
+  width: 100%;
+}
+
+/* 自定义分页组件样式 */
+.mobile-pagination {
+  display: none;
+  width: 100%;
+}
+
+.mobile-pagination-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  padding: 10px 0;
+}
+
+.pagination-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #dcdfe6;
+  background-color: #fff;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin: 0 5px;
+  flex-shrink: 0;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: #409eff;
+  color: #409eff;
+}
+
+.arrow {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.pagination-numbers {
+  display: flex;
+  align-items: center;
+  margin: 0 5px;
+  flex-shrink: 0;
+}
+
+.page-number {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #dcdfe6;
+  background-color: #fff;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+.page-number:hover {
+  border-color: #409eff;
+  color: #409eff;
+}
+
+.page-number.active {
+  background-color: #409eff;
+  color: #fff;
+  border-color: #409eff;
+}
+
+/* 响应式布局 - 手机端适配 */
+@media (max-width: 768px) {
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .desktop-pagination {
+    display: none;
+  }
+  
+  .mobile-pagination {
+    display: block;
+  }
+  
+  .mobile-pagination-content {
+    width: 100%;
+  }
+  
+  /* 筛选区域适配 */
+  .filter-section {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 2px !important;
+    padding: 5px !important;
+    width: 100% !important;
+  }
+  
+  /* 隐藏所有筛选标签 */
+  .filter-section .filter-label {
+    display: none !important;
+  }
+  
+  /* 只显示搜索框、媒体选择和查询按钮 */
+  .filter-section > *:not(.el-input):not(.el-select:nth-child(4)):not(.el-button) {
+    display: none !important;
+  }
+  
+  /* 搜索框占主要宽度 */
+  .filter-section .el-input {
+    flex: 1 !important;
+    min-width: 120px !important;
+    margin-right: 2px !important;
+  }
+  
+  /* 媒体选择固定宽度 */
+  .filter-section .el-select:nth-child(4) {
+    flex: 0 0 100px !important;
+    margin-right: 2px !important;
+  }
+  
+  /* 查询按钮固定宽度 */
+  .filter-section .el-button {
+    flex: 0 0 60px !important;
+    background-color: #409eff !important;
+    color: #ffffff !important;
+    border: 1px solid #409eff !important;
+    height: 30px !important;
+    font-size: 12px !important;
+    padding: 0 !important;
+  }
+  
+  /* 调整输入框和选择器样式 */
+  .filter-section .el-input__wrapper,
+  .filter-section .el-select .el-input__wrapper {
+    border-radius: 4px !important;
+    border: 1px solid #dcdfe6 !important;
+    background-color: #ffffff !important;
+    box-shadow: none !important;
+    height: 30px !important;
+  }
+  
+  /* 调整输入框字体大小 */
+  .filter-section .el-input__wrapper input,
+  .filter-section .el-select .el-input__wrapper input {
+    font-size: 12px !important;
+    line-height: 30px !important;
+  }
+  
+  /* 调整选择器下拉箭头位置 */
+  .filter-section .el-select .el-input__wrapper .el-select__caret {
+    line-height: 30px !important;
+  }
+  
+  /* 隐藏页面标题 */
+  .header h2 {
+    display: none;
+  }
+  
+  /* 隐藏新增和导出按钮 */
+  .header-actions .el-button:not(:first-child) {
+    display: none;
+  }
+}
+
+/* 新闻列表容器样式 */
+.news-list-container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 330px);
+}
+
+/* 响应式布局 - 手机端适配 */
+@media (max-width: 768px) {
+  .assessment-container {
+    padding: 10px;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  
+  .filter-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .filter-section .el-input,
+  .filter-section .el-select {
+    width: 100% !important;
+    margin-right: 0 !important;
+  }
+  
+  .filter-section .el-checkbox {
+    margin-top: 5px;
+  }
+  
+  /* 隐藏桌面端表格，显示手机端卡片列表 */
+  .desktop-table {
+    display: none;
+  }
+  
+  .mobile-card-list {
+    display: block;
+  }
+  
+  /* 分页组件适配 */
+  .desktop-pagination {
+    display: none;
+  }
+  
+  .mobile-pagination {
+    display: block;
+    width: 100%;
+  }
+  
+  /* 新闻列表容器适配 */
+  .news-list-container {
+    height: auto;
+    min-height: 200px;
+  }
+  
+  /* 表格适配 */
+  .el-table {
+    font-size: 12px;
+  }
+  
+  .el-table th {
+    padding: 8px 4px;
+  }
+  
+  .el-table td {
+    padding: 8px 4px;
+  }
+  
+  /* 弹窗适配 */
+  .video-modal {
+    width: 95%;
+    max-width: 95%;
+  }
+  
+  .video-container {
+    height: 200px;
+  }
+  
+  .html-modal {
+    width: 95%;
+    max-width: 95%;
+  }
+  
+  .html-modal-content {
+    padding: 10px;
+  }
+  
+  .paper-container {
+    height: 400px;
+  }
+  
+
+  
+  /* 打分页面（编辑对话框）手机模式适配 */
+  /* 使用更具体的选择器确保样式生效 */
+  @media (max-width: 768px) {
+    body .score-dialog {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      box-sizing: border-box !important;
+      left: 0 !important;
+      right: 0 !important;
+      transform: none !important;
+      position: fixed !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      height: 100% !important;
+      border-radius: 0 !important;
+    }
+    
+    body .score-dialog .el-dialog__body {
+      padding: 10px !important;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      height: calc(100% - 100px) !important;
+    }
+    
+    /* 调整表单容器 */
+    body .score-dialog .el-form {
+      width: 100% !important;
+      box-sizing: border-box !important;
+      padding: 0 !important;
+    }
+    
+    /* 调整表单标签宽度 */
+    body .score-dialog .el-form .el-form-item__label {
+      width: 50px !important;
+      font-size: 12px !important;
+      padding-right: 5px !important;
+      line-height: 28px !important;
+      box-sizing: border-box !important;
+    }
+    
+    /* 调整表单内容宽度 */
+    body .score-dialog .el-form .el-form-item__content {
+      margin-left: 55px !important;
+      width: calc(100% - 55px) !important;
+      box-sizing: border-box !important;
+      padding-right: 0 !important;
+    }
+    
+    /* 调整输入框宽度 */
+    body .score-dialog .el-form .el-input,
+    body .score-dialog .el-form .el-select,
+    body .score-dialog .el-form .el-input-number,
+    body .score-dialog .el-form .el-date-picker {
+      width: 100% !important;
+      margin-right: 0 !important;
+      box-sizing: border-box !important;
+    }
+    
+    /* 调整输入框包装器宽度 */
+    body .score-dialog .el-form .el-input__wrapper {
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    
+    /* 调整记者项宽度 */
+    body .score-dialog .reporter-item {
+      width: 100% !important;
+      box-sizing: border-box !important;
+      padding-right: 0 !important;
+    }
+    
+    /* 调整表单项目 */
+    body .score-dialog .el-form-item {
+      width: 100% !important;
+      box-sizing: border-box !important;
+      margin-bottom: 10px !important;
+    }
+    
+    /* 调整输入框和选择器 */
+    body .score-dialog .el-input,
+    body .score-dialog .el-select,
+    body .score-dialog .el-input-number {
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    
+    /* 调整数字输入框 */
+    body .score-dialog .el-input-number .el-input__wrapper {
+      width: 100% !important;
+    }
+    
+    /* 调整选择器 */
+    body .score-dialog .el-select .el-input {
+      width: 100% !important;
+    }
+    
+    /* 调整对话框头部 */
+    body .score-dialog .el-dialog__header {
+      padding: 10px 15px !important;
+      box-sizing: border-box !important;
+    }
+    
+    body .score-dialog .el-dialog__title {
+      font-size: 16px !important;
+    }
+    
+    /* 调整对话框底部按钮布局 */
+    body .score-dialog .el-dialog__footer {
+      padding: 10px !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      box-sizing: border-box !important;
+    }
+    
+    body .score-dialog .el-dialog__footer .el-button {
+      flex: 1 !important;
+      margin: 0 5px !important;
+    }
+    
+    /* 调整按钮大小 */
+    body .score-dialog .el-button {
+      font-size: 12px !important;
+      padding: 0 10px !important;
+      height: 28px !important;
+    }
+    
+    /* 调整输入框和选择器的高度 */
+    body .score-dialog .el-input__wrapper,
+    body .score-dialog .el-select .el-input__wrapper,
+    body .score-dialog .el-input-number {
+      height: 28px !important;
+    }
+    
+    /* 调整输入框内容垂直居中 */
+    body .score-dialog .el-input__wrapper input {
+      line-height: 28px !important;
+    }
+    
+    /* 调整媒体类型选择器 */
+    body .score-dialog .el-select .el-input__wrapper {
+      padding: 0 10px !important;
+    }
+    
+    /* 调整记者项布局 */
+    body .score-dialog .reporter-item {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 5px !important;
+      width: 100% !important;
+      align-items: center !important;
+      padding-right: 0 !important;
+    }
+    
+    body .score-dialog .reporter-item .el-input {
+      flex: 1 !important;
+      min-width: 80px !important;
+      margin-right: 0 !important;
+    }
+    
+    body .score-dialog .reporter-item .el-input-number {
+      flex: 0 0 60px !important;
+      margin-right: 0 !important;
+    }
+    
+    body .score-dialog .reporter-item .el-button {
+      flex: 0 0 40px !important;
+      margin-right: 0 !important;
+    }
+    
+    /* 调整添加记者按钮 */
+    body .score-dialog .el-form-item .el-button {
+      width: auto !important;
+      flex: none !important;
+    }
+    
+    /* 强制设置对话框宽度，确保覆盖默认样式 */
+    .el-dialog.score-dialog {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      position: fixed !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      height: 100% !important;
+      border-radius: 0 !important;
+    }
+    
+    /* 确保对话框内容不溢出 */
+    .el-dialog.score-dialog .el-dialog__body {
+      max-width: 100% !important;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      box-sizing: border-box !important;
+    }
+    
+    /* 调整对话框头部 */
+    .el-dialog.score-dialog .el-dialog__header {
+      padding: 10px 15px !important;
+      box-sizing: border-box !important;
+    }
+    
+    /* 调整对话框底部 */
+    .el-dialog.score-dialog .el-dialog__footer {
+      padding: 10px !important;
+      box-sizing: border-box !important;
+    }
+    
+    /* 调整记者项布局 */
+    .reporter-item {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 5px !important;
+      width: 100% !important;
+      align-items: center !important;
+      box-sizing: border-box !important;
+      padding-right: 0 !important;
+    }
+    
+    .reporter-item .el-input {
+      flex: 1 !important;
+      min-width: 80px !important;
+      margin-right: 0 !important;
+      box-sizing: border-box !important;
+    }
+    
+    .reporter-item .el-input-number {
+      flex: 0 0 60px !important;
+      margin-right: 0 !important;
+      box-sizing: border-box !important;
+    }
+    
+    .reporter-item .el-button {
+      flex: 0 0 40px !important;
+      margin-right: 0 !important;
+      box-sizing: border-box !important;
+    }
+  }
+  
+  /* 调整添加记者按钮 */
+  .el-form-item .el-button {
+    width: auto !important;
+    flex: none !important;
+  }
+  
+  /* 记者选择弹窗移动端适配 */
+  @media (max-width: 768px) {
+    .el-dialog {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      box-sizing: border-box !important;
+      position: fixed !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      height: 100% !important;
+      border-radius: 0 !important;
+    }
+    
+    .el-dialog .el-dialog__body {
+      padding: 10px !important;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      height: calc(100% - 100px) !important;
+    }
+    
+    .reporter-select-container {
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    
+    .reporter-select-container .el-input {
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    
+    .reporter-select-container .el-table {
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    
+    .reporter-select-container .el-table th,
+    .reporter-select-container .el-table td {
+      padding: 8px 4px !important;
+      font-size: 12px !important;
+    }
+    
+    .el-dialog .el-dialog__header {
+      padding: 10px 15px !important;
+      box-sizing: border-box !important;
+    }
+    
+    .el-dialog .el-dialog__title {
+      font-size: 16px !important;
+    }
+    
+    .el-dialog .el-dialog__footer {
+      padding: 10px !important;
+      box-sizing: border-box !important;
+    }
+  }
+  
+  /* 调整媒体类型选择器 */
+  .el-select .el-input__wrapper {
+    padding: 0 10px !important;
+  }
+  
+  /* 调整输入框和选择器的高度 */
+  .el-input__wrapper,
+  .el-select .el-input__wrapper,
+  .el-input-number {
+    height: 28px !important;
+  }
+  
+  /* 调整输入框内容垂直居中 */
+  .el-input__wrapper input {
+    line-height: 28px !important;
+  }
+  
+  /* 调整对话框头部 */
+  .el-dialog__header {
+    padding: 10px 15px !important;
+  }
+  
+  .el-dialog__title {
+    font-size: 16px !important;
+  }
+  
+  /* 调整按钮大小 */
+  .el-button {
+    font-size: 12px !important;
+    padding: 0 10px !important;
+    height: 28px !important;
+  }
+  
+  /* 调整对话框底部按钮布局 */
+  .el-dialog__footer {
+    padding: 10px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+  }
+  
+  .el-dialog__footer .el-button {
+    flex: 1 !important;
+    margin: 0 5px !important;
+  }
+  
+  /* 调整日期选择器大小 */
+  .el-date-picker {
+    font-size: 12px !important;
+  }
+  
+  /* 调整输入框内容大小 */
+  .el-input__wrapper input,
+  .el-select .el-input__wrapper input {
+    font-size: 12px !important;
+  }
+  
+  /* 调整表单项目间距 */
+  .el-form-item {
+    margin-bottom: 10px !important;
+  }
+  
+  /* 确保容器宽度 */
+  .el-dialog__wrapper {
+    width: 100% !important;
+  }
+} 
 </style>

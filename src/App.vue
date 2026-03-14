@@ -21,13 +21,15 @@
             <el-icon><DataAnalysis /></el-icon>
             记者统计
           </el-menu-item>
-          <el-menu-item index="/login" @click="logout" v-if="isLoggedIn">
-            <el-icon><SwitchButton /></el-icon>
-            退出登录
-          </el-menu-item>
         </el-menu>
-        <div v-if="isLoggedIn" class="user-info">
-          欢迎，{{ username }}
+        <div class="header-right">
+          <div v-if="isLoggedIn" class="user-info">
+            欢迎，{{ username }}
+          </div>
+          <div class="logout-button" @click="logout">
+            <el-icon><SwitchButton /></el-icon>
+            <span>退出登录</span>
+          </div>
         </div>
       </el-header>
       <el-main>
@@ -118,15 +120,85 @@ body {
   border-bottom: none;
 }
 
-.user-info {
-  color: #fff;
-  margin-left: 20px;
+.header-right {
   display: flex;
   align-items: center;
+  margin-left: auto;
+}
+
+.user-info {
+  color: #fff;
+  margin-right: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.logout-button {
+  color: #fff !important;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  padding: 0 15px;
+  height: 40px;
+}
+
+.logout-button:hover {
+  color: #ffd04b !important;
+}
+
+/* 调整按钮内部图标和文字的布局 */
+.logout-button .el-icon {
+  margin-right: 5px;
+  font-size: 16px;
 }
 
 .el-main {
   padding: 20px;
   background-color: #f9f9f9;
+}
+/* 响应式布局 - 手机端适配 */
+@media (max-width: 768px) {
+  .el-header {
+    padding: 0 10px;
+  }
+  
+  .logo {
+    font-size: 16px;
+    margin-right: 10px;
+  }
+  
+  /* 隐藏文章列表和记者统计菜单 */
+  .el-menu-demo {
+    display: none !important;
+  }
+  
+  /* 调整右侧容器 */
+  .header-right {
+    flex: 0 0 auto;
+  }
+  
+  /* 隐藏用户信息 */
+  .user-info {
+    display: none !important;
+  }
+  
+  /* 调整退出按钮样式 */
+  .logout-button {
+    font-size: 14px;
+    padding: 0 10px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    color: #fff !important;
+    font-weight: 500;
+  }
+  
+  /* 确保按钮内部图标和文字正确显示 */
+  .logout-button .el-icon {
+    margin-right: 5px;
+    font-size: 16px;
+  }
 }
 </style>

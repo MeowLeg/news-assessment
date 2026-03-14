@@ -229,7 +229,12 @@ export const fetchReporters = async () => {
   loading.value = true
   error.value = null
   try {
-    const response = await api.getReporters()
+    // 检查userData中的department字段
+    const department = userData.value.department
+    console.log('用户部门信息:', department)
+    
+    // 根据department字段决定是否传入参数
+    const response = await api.getReporters(department ? { department } : {})
     console.log('记者列表API响应:', response)
     
     if (response && response.success) {
@@ -261,7 +266,17 @@ export const fetchReporterMonthlyStats = async (year = 2025, month = 12) => {
   loading.value = true
   error.value = null
   try {
-    const response = await api.calcMonthly({ year, month })
+    // 检查userData中的department字段
+    const department = userData.value.department
+    console.log('用户部门信息:', department)
+    
+    // 根据department字段决定是否传入参数
+    const params = { year, month }
+    if (department) {
+      params.department = department
+    }
+    
+    const response = await api.calcMonthly(params)
     if (response.success) {
       console.log('API返回的记者月度统计:', response.data)
       reporterMonthlyStats.value = response.data
