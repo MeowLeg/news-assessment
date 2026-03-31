@@ -66,6 +66,11 @@ const submitForm = async () => {
           localStorage.setItem('isLoggedIn', 'true')
           localStorage.setItem('userData', JSON.stringify(response.data))
           
+          // 检查是否有department字段，如果有则保存用于自动筛选
+          if (response.data && response.data.department) {
+            localStorage.setItem('userDepartment', response.data.department)
+          }
+          
           // 更新store.js中的登录状态变量
           isLoggedIn.value = true
           userData.value = response.data

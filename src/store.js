@@ -22,7 +22,7 @@ export const loading = ref(false)
 export const error = ref(null)
 
 // 从API获取文章列表
-export const fetchArticles = async (year = 2025, month = 12, page = 1, limit = 20, keyword = null, reporter_id = null, media_type = null, is_collaboration = false) => {
+export const fetchArticles = async (year = 2025, month = 12, page = 1, limit = 20, keyword = null, reporter_id = null, media_type = null, is_collaboration = false, department = null) => {
   loading.value = true
   error.value = null
   try {
@@ -33,6 +33,7 @@ export const fetchArticles = async (year = 2025, month = 12, page = 1, limit = 2
     if (media_type) payload.tv_or_paper = media_type - 1
     payload.is_collaboration = null;
     if (is_collaboration) payload.is_collaboration = 1;
+    if (department) payload.department = department;
     const response = await api.getArticles(payload)
     console.log('API完整响应:', response)
     

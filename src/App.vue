@@ -62,6 +62,12 @@ const checkLoginStatus = () => {
   } else {
     userData.value = {}
   }
+  
+  // 同步 department 到 userData（如果 localStorage 中有保存）
+  const savedDepartment = localStorage.getItem('userDepartment')
+  if (savedDepartment && !userData.value.department) {
+    userData.value.department = savedDepartment
+  }
 }
 
 // 登出功能
@@ -69,6 +75,7 @@ const logout = () => {
   // 清除登录状态
   localStorage.removeItem('isLoggedIn')
   localStorage.removeItem('userData')
+  localStorage.removeItem('userDepartment')
   isLoggedIn.value = false
   userData.value = {}
   

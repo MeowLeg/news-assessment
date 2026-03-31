@@ -2,7 +2,7 @@
   <div class="assessment-container">
     <!-- 页面标题和操作区 -->
     <div class="header">
-      <h2>{{ month }} 新闻中心月度考核表</h2>
+      <h2>{{ month }} {{ hasDepartment ? userData.department : '新闻中心' }}月度考核表</h2>
       <div class="header-actions">
         <el-select v-model="selectedMonth" @change="changeMonth" placeholder="选择月份">
           <el-option
@@ -12,7 +12,7 @@
             :value="m.value"
           />
         </el-select>
-        <el-button type="primary" icon="Plus" @click="openAddDialog">新增新闻评分</el-button>
+        <el-button icon="Plus" @click="openAddDialog" class="add-news-button">增补新闻</el-button>
         <el-tooltip content="仅导出当前页面数据" placement="top">
           <el-button type="success" icon="Download" @click="exportToExcel">导出Excel</el-button>
         </el-tooltip>
@@ -190,15 +190,17 @@
         v-model="searchKeyword"
         placeholder="搜索新闻标题"
         prefix-icon="Search"
-        style="width: 1100px; margin-right: 10px"
+        :style="{ width: hasDepartment ? '1500px' : '1100px', marginRight: '10px' }"
       />
-      <span class="filter-label">媒体：</span>
+      <span v-if="!hasDepartment" class="filter-label">媒体：</span>
       <el-select 
+        v-if="!hasDepartment"
         v-model="filterMediaType"
         placeholder="媒体类型"
         style="width: 300px; margin-right: 10px"
+        :disabled="filterDepartmentOnly"
       >
-        <el-option label="全部" value="0" />
+        <el-option label="全部部门" value="0" />
         <el-option
           v-for="program in programs"
           :key="program.site_id"
@@ -212,7 +214,7 @@
         placeholder="筛选记者"
         style="width: 300px; margin-right: 10px"
       >
-        <el-option label="全部" value="0" />
+        <el-option label="全部记者" value="0" />
         <el-option
           v-for="reporter in reporters"
           :key="reporter.id"
@@ -220,7 +222,8 @@
           :value="reporter.id"
         />
       </el-select>
-      <el-checkbox v-model="filterCorrespondent" style="margin-right: 10px">通讯员</el-checkbox>
+      <el-checkbox v-if="!hasDepartment" v-model="filterCorrespondent" style="margin-right: 10px" :disabled="filterDepartmentOnly">通讯员</el-checkbox>
+      <el-checkbox v-if="hasDepartment" v-model="filterDepartmentOnly" style="margin-right: 10px; display: none;">仅本部门</el-checkbox>
       <el-button type="primary" icon="Search" @click="handleSearch">查询</el-button>
     </div>
 
@@ -244,9 +247,9 @@
           {{ (currentPage - 1) * pageSize + scope.$index + 1 }}
         </template>
       </el-table-column>
-      <el-table-column prop="title" label="新闻标题" min-width="350" />
+      <el-table-column prop="title" label="新闻标题" :min-width="hasDepartment ? 200 : 350" />
       <el-table-column prop="publishDate" label="发布日期" width="100" />
-      <el-table-column label="媒体" width="120">
+      <el-table-column v-if="!hasDepartment" label="媒体" width="120">
         <template #default="scope">
           {{ scope.row.program_name || '未知媒体' }}
         </template>
@@ -258,19 +261,19 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column label="版号" width="80">
+      <el-table-column v-if="!hasDepartment" label="版号" width="80">
         <template #default="scope">
           {{ scope.row.page_meta_id !== 0 ? scope.row.page_meta_id : '' }}
         </template>
       </el-table-column>
-      <el-table-column label="版名" width="120">
+      <el-table-column v-if="!hasDepartment" label="版名" width="120">
         <template #default="scope">
           {{ scope.row.page_meta_id !== 0 ? scope.row.page_name : '' }}
         </template>
       </el-table-column>
-      <el-table-column prop="textReporter" label="文字记者" width="130" />
-      <el-table-column prop="photoReporter" label="摄影记者" width="130" />
-      <el-table-column prop="correspondentReporter" label="通讯员" width="130" />
+      <el-table-column prop="textReporter" label="文字记者" :width="hasDepartment ? 250 : 150" />
+      <el-table-column prop="photoReporter" label="摄影记者" :width="hasDepartment ? 150 : 100" />
+      <el-table-column prop="correspondentReporter" label="通讯员" :width="hasDepartment ? 130 : 150" />
 
       <!-- <el-table-column prop="bonus" label="加分项" width="80">
         <template #default="scope">
@@ -289,7 +292,7 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column label="差额" width="100">
+      <el-table-column v-if="!hasDepartment" label="差额" width="100">
         <template #default="scope">
           <span :class="{ 'text-danger': typeof calculateScoreDifference(scope.row) === 'number' && calculateScoreDifference(scope.row) !== 0 }">
             {{ calculateScoreDifference(scope.row) }}
@@ -309,9 +312,9 @@
           </div>
         </template>
       </el-table-column> -->
-      <el-table-column label="操作" width="280">
+      <el-table-column label="操作" :width="hasDepartment ? 250 : 280">
         <template #default="scope">
-          <el-button size="small" type="primary" @click="openEditDialog(scope.row)">打分</el-button>
+          <el-button size="small" class="add-news-button" @click="openEditDialog(scope.row)">打分</el-button>
           <!-- 用于展示电视新闻或报纸新闻的链接 -->
           <el-button 
             v-if="scope.row.media_type === 0"
@@ -333,6 +336,7 @@
             @click="openHtmlContentDialog(scope.row)"
           >文稿</el-button>
           <el-button 
+            v-if="!hasDepartment"
             type="warning" 
             size="small" 
             @click="deleteArticle(scope.row)"
@@ -369,8 +373,13 @@
       </div>
     </div>
 
+    <!-- 总条数显示（当有部门时显示） -->
+    <div class="total-count-container" v-if="hasDepartment">
+      <span class="total-count">共 {{ totalArticles }} 条数据</span>
+    </div>
+    
     <!-- 分页 -->
-    <div class="pagination-container">
+    <div class="pagination-container" v-if="!hasDepartment">
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -417,7 +426,7 @@
     <!-- 新增/编辑弹窗 -->
     <el-dialog
       v-model="dialogVisible"
-      :title="isEdit ? '编辑新闻评分' : '新增新闻评分'"
+      :title="isEdit ? '编辑新闻评分' : '增补新闻'"
       :width="isMobile ? '100%' : '600px'"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
@@ -432,7 +441,7 @@
           label-width="100px"
         >
           <el-form-item label="新闻标题" prop="title">
-            <el-input v-model="newsForm.title" placeholder="请输入新闻标题" />
+            <el-input v-model="newsForm.title" placeholder="请输入新闻标题" :disabled="isEdit" />
           </el-form-item>
           <el-form-item label="发布日期" prop="publishDate">
             <el-date-picker
@@ -440,11 +449,13 @@
               type="date"
               placeholder="选择发布日期"
               style="width: 100%"
+              :disabled="isEdit"
             />
           </el-form-item>
           <!-- 文字记者 -->
           <el-form-item label="文字记者">
-            <div v-for="(reporter, index) in newsForm.textReporters" :key="'text-' + index" class="reporter-item">
+            <div v-if="newsForm.textReporters.length === 0" class="no-reporter">无</div>
+            <div v-else v-for="(reporter, index) in newsForm.textReporters" :key="'text-' + index" class="reporter-item">
               <el-input 
                 v-model="reporter.reporter_name" 
                 placeholder="请输入记者姓名" 
@@ -457,12 +468,14 @@
                 :precision="0" 
                 placeholder="分数" 
                 style="width: 120px; margin-right: 10px;"
+                :disabled="!reporters.some(r => r.name === reporter.reporter_name)"
               />
               <el-button 
+                v-if="!hasDepartment"
                 type="warning" 
-              size="small" 
-              @click="removeReporter('text', index)"
-            >删除</el-button>
+                size="small" 
+                @click="removeReporter('text', index)"
+              >删除</el-button>
             </div>
             <el-button type="primary" size="small" @click="addReporter('text')" style="margin-top: 10px;">
               <el-icon><Plus /></el-icon> 添加文字记者
@@ -471,7 +484,8 @@
           
           <!-- 摄影记者 -->
           <el-form-item label="摄影记者">
-            <div v-for="(reporter, index) in newsForm.photoReporters" :key="'photo-' + index" class="reporter-item">
+            <div v-if="newsForm.photoReporters.length === 0" class="no-reporter">无</div>
+            <div v-else v-for="(reporter, index) in newsForm.photoReporters" :key="'photo-' + index" class="reporter-item">
               <el-input 
                 v-model="reporter.reporter_name" 
                 placeholder="请输入记者姓名" 
@@ -484,8 +498,10 @@
                 :precision="0" 
                 placeholder="分数" 
                 style="width: 120px; margin-right: 10px;"
+                :disabled="!reporters.some(r => r.name === reporter.reporter_name)"
               />
               <el-button 
+                v-if="!hasDepartment"
                 type="warning" 
                 size="small" 
                 @click="removeReporter('photo', index)"
@@ -498,7 +514,8 @@
           
           <!-- 通讯员 -->
           <el-form-item label="通讯员">
-            <div v-for="(reporter, index) in newsForm.correspondentReporters" :key="'correspondent-' + index" class="reporter-item">
+            <div v-if="newsForm.correspondentReporters.length === 0" class="no-reporter">无</div>
+            <div v-else v-for="(reporter, index) in newsForm.correspondentReporters" :key="'correspondent-' + index" class="reporter-item">
               <el-input 
                 v-model="reporter.reporter_name" 
                 placeholder="请输入通讯员姓名" 
@@ -511,18 +528,20 @@
                 :precision="0" 
                 placeholder="分数" 
                 style="width: 120px; margin-right: 10px;"
+                :disabled="!reporters.some(r => r.name === reporter.reporter_name)"
               />
               <el-button 
+                v-if="!hasDepartment"
                 type="warning" 
                 size="small" 
                 @click="removeReporter('correspondent', index)"
               >删除</el-button>
             </div>
-            <el-button type="primary" size="small" @click="addReporter('correspondent')" style="margin-top: 10px;">
+            <el-button v-if="!hasDepartment" type="primary" size="small" @click="addReporter('correspondent')" style="margin-top: 10px;">
               <el-icon><Plus /></el-icon> 添加通讯员
             </el-button>
           </el-form-item>
-          <el-form-item label="媒体类型" prop="program_id">
+          <el-form-item v-if="!hasDepartment" label="媒体类型" prop="program_id">
             <el-select
               v-model="newsForm.program_id"
               placeholder="请选择媒体类型"
@@ -532,14 +551,14 @@
                 v-for="program in programs"
                 :key="program.id"
                 :label="program.name"
-                :value="program.media_type"
+                :value="program.site_id"
               />
             </el-select>
           </el-form-item>
-          <el-form-item label="TV URL" prop="tv_url">
+          <el-form-item v-if="!hasDepartment" label="TV URL" prop="tv_url">
             <el-input v-model="newsForm.tv_url" placeholder="请输入视频流地址" />
           </el-form-item>
-          <el-form-item label="电子报URL" prop="paper_url">
+          <el-form-item v-if="!hasDepartment" label="电子报URL" prop="paper_url">
             <el-input v-model="newsForm.paper_url" placeholder="请输入电子报URL" />
           </el-form-item>
           <el-form-item label="参考字数">
@@ -558,18 +577,18 @@
               placeholder="请输入执行分"
               style="width: 200px"
             />
-            <div style="margin-top: 5px; color: #999; font-size: 12px;">
+            <!-- <div style="margin-top: 5px; color: #999; font-size: 12px;">
               记者得分合计 - 基本分
-            </div>
+            </div> -->
           </el-form-item>
-          <el-form-item label="总分">
+          <el-form-item v-if="!hasDepartment" label="总分">
             <el-input
               v-model="totalScore"
               disabled
               style="width: 200px; color: #666"
             />
           </el-form-item>
-          <el-form-item label="差额">
+          <el-form-item v-if="!hasDepartment" label="差额">
             <el-input
               :value="scoreDifference"
               :style="{ width: '200px', color: scoreDifference > 0 ? '#f56c6c' : scoreDifference < 0 ? '#67c23a' : '#666' }"
@@ -590,7 +609,7 @@
           :rules="newsFormRules"
         >
           <el-form-item label="新闻标题" prop="title">
-            <el-input v-model="newsForm.title" placeholder="请输入新闻标题" />
+            <el-input v-model="newsForm.title" placeholder="请输入新闻标题" :disabled="isEdit" />
           </el-form-item>
           <el-form-item label="发布日期" prop="publishDate">
             <el-date-picker
@@ -598,11 +617,13 @@
               type="date"
               placeholder="选择发布日期"
               style="width: 100%"
+              :disabled="isEdit"
             />
           </el-form-item>
           <!-- 文字记者 -->
           <el-form-item label="文字记者">
-            <div v-for="(reporter, index) in newsForm.textReporters" :key="'text-' + index" class="mobile-reporter-item">
+            <div v-if="newsForm.textReporters.length === 0" class="no-reporter">无</div>
+            <div v-else v-for="(reporter, index) in newsForm.textReporters" :key="'text-' + index" class="mobile-reporter-item">
               <el-input 
                 v-model="reporter.reporter_name" 
                 placeholder="请输入记者姓名" 
@@ -624,14 +645,15 @@
                 >删除</el-button>
               </div>
             </div>
-            <el-button type="primary" size="small" @click="addReporter('text')" style="margin-top: 10px;">
+            <el-button v-if="!hasDepartment" type="primary" size="small" @click="addReporter('text')" style="margin-top: 10px;">
               <el-icon><Plus /></el-icon> 添加文字记者
             </el-button>
           </el-form-item>
           
           <!-- 摄影记者 -->
           <el-form-item label="摄影记者">
-            <div v-for="(reporter, index) in newsForm.photoReporters" :key="'photo-' + index" class="mobile-reporter-item">
+            <div v-if="newsForm.photoReporters.length === 0" class="no-reporter">无</div>
+            <div v-else v-for="(reporter, index) in newsForm.photoReporters" :key="'photo-' + index" class="mobile-reporter-item">
               <el-input 
                 v-model="reporter.reporter_name" 
                 placeholder="请输入记者姓名" 
@@ -653,14 +675,15 @@
                 >删除</el-button>
               </div>
             </div>
-            <el-button type="primary" size="small" @click="addReporter('photo')" style="margin-top: 10px;">
+            <el-button v-if="!hasDepartment" type="primary" size="small" @click="addReporter('photo')" style="margin-top: 10px;">
               <el-icon><Plus /></el-icon> 添加摄影记者
             </el-button>
           </el-form-item>
           
           <!-- 通讯员 -->
           <el-form-item label="通讯员">
-            <div v-for="(reporter, index) in newsForm.correspondentReporters" :key="'correspondent-' + index" class="mobile-reporter-item">
+            <div v-if="newsForm.correspondentReporters.length === 0" class="no-reporter">无</div>
+            <div v-else v-for="(reporter, index) in newsForm.correspondentReporters" :key="'correspondent-' + index" class="mobile-reporter-item">
               <el-input 
                 v-model="reporter.reporter_name" 
                 placeholder="请输入通讯员姓名" 
@@ -682,11 +705,11 @@
                 >删除</el-button>
               </div>
             </div>
-            <el-button type="primary" size="small" @click="addReporter('correspondent')" style="margin-top: 10px;">
+            <el-button v-if="!hasDepartment" type="primary" size="small" @click="addReporter('correspondent')" style="margin-top: 10px;">
               <el-icon><Plus /></el-icon> 添加通讯员
             </el-button>
           </el-form-item>
-          <el-form-item label="媒体类型" prop="program_id">
+          <el-form-item v-if="!hasDepartment" label="媒体类型" prop="program_id">
             <el-select
               v-model="newsForm.program_id"
               placeholder="请选择媒体类型"
@@ -696,14 +719,14 @@
                 v-for="program in programs"
                 :key="program.id"
                 :label="program.name"
-                :value="program.media_type"
+                :value="program.site_id"
               />
             </el-select>
           </el-form-item>
-          <el-form-item label="TV URL" prop="tv_url">
+          <el-form-item v-if="!hasDepartment" label="TV URL" prop="tv_url">
             <el-input v-model="newsForm.tv_url" placeholder="请输入视频流地址" />
           </el-form-item>
-          <el-form-item label="电子报URL" prop="paper_url">
+          <el-form-item v-if="!hasDepartment" label="电子报URL" prop="paper_url">
             <el-input v-model="newsForm.paper_url" placeholder="请输入电子报URL" />
           </el-form-item>
           <el-form-item label="参考字数">
@@ -726,14 +749,14 @@
               记者得分合计 - 基本分
             </div>
           </el-form-item>
-          <el-form-item label="总分">
+          <el-form-item v-if="!hasDepartment" label="总分">
             <el-input
               v-model="totalScore"
               disabled
               style="width: 100%; color: #666"
             />
           </el-form-item>
-          <el-form-item label="差额">
+          <el-form-item v-if="!hasDepartment" label="差额">
             <el-input
               :value="scoreDifference"
               :style="{ width: '100%', color: scoreDifference > 0 ? '#f56c6c' : scoreDifference < 0 ? '#67c23a' : '#666' }"
@@ -755,11 +778,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import * as XLSX from 'xlsx'
 import dayjs from 'dayjs'
-import { newsList, totalArticles, allReporters, reporters, month, selectedMonth, monthOptions, fetchArticles, fetchReporters, saveArticle, scoreArticle, loading, error } from '../store.js'
+import { newsList, totalArticles, allReporters, reporters, month, selectedMonth, monthOptions, fetchArticles, fetchReporters, saveArticle, scoreArticle, loading, error, userData } from '../store.js'
 import api from '../api/index.js'
 
 // 移动设备检测
@@ -775,6 +798,38 @@ const filterReporter = ref('')
 const filterReporterId = ref('0') // 0 表示全部记者
 const filterMediaType = ref('0') // 0 表示全部媒体
 const filterCorrespondent = ref(false) // 是否只显示通讯员
+const filterDepartmentOnly = ref(false) // 是否仅显示本部门
+
+// 监听filterDepartmentOnly变化，清空并禁用其他搜索字段
+watch(filterDepartmentOnly, (newVal) => {
+  if (newVal) {
+    // 清空搜索字段
+    searchKeyword.value = ''
+    filterMediaType.value = '0'
+    filterReporterId.value = '0'
+    filterCorrespondent.value = false
+    // 设置页面条数为9999
+    pageSize.value = 9999
+  } else {
+    // 去掉钩子时，设置页面条数为20
+    pageSize.value = 20
+  }
+})
+
+// 监听记者下拉框变化，当department不为空且选择"全部记者"时，相当于勾选"仅本部门"
+watch(filterReporterId, (newVal) => {
+  if (hasDepartment.value) {
+    if (newVal === '0') {
+      // 选择"全部记者"时，相当于勾选"仅本部门"
+      filterDepartmentOnly.value = true
+      pageSize.value = 9999
+    } else {
+      // 选择具体记者时，取消"仅本部门"勾选
+      filterDepartmentOnly.value = false
+      pageSize.value = 20
+    }
+  }
+})
 
 // 节目列表（媒体类型）
 const programs = ref([])
@@ -831,6 +886,11 @@ const visiblePages = computed(() => {
   }
   
   return pages
+})
+
+// 判断是否有部门信息（登录时返回的department字段不为空）
+const hasDepartment = computed(() => {
+  return !!userData.value.department || !!localStorage.getItem('userDepartment')
 })
 
 // 筛选后的记者列表
@@ -1072,7 +1132,9 @@ const handleSearch = async () => {
   currentPage.value = 1 // 搜索时回到第一页
   // 重新获取数据，将搜索关键词和筛选条件传递给后端
   const [year, month] = selectedMonth.value.split('-').map(Number)
-  await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value: null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value)
+  // 处理部门筛选
+  const department = filterDepartmentOnly.value && userData.value.department ? userData.value.department : null
+  await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value: null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value, department)
 }
 
 // 计算表格行中文章的剩余可分配分数
@@ -1134,6 +1196,14 @@ onMounted(async () => {
   // 检测移动设备
   checkIsMobile()
   
+  // 检查用户是否有部门信息，如果有则自动勾选"仅本部门"
+  const savedDepartment = localStorage.getItem('userDepartment')
+  if (savedDepartment) {
+    filterDepartmentOnly.value = true
+    userData.value.department = savedDepartment
+    pageSize.value = 9999
+  }
+  
   // 生成近12个月的选项
   const options = []
   for (let i = 0; i < 12; i++) {
@@ -1160,10 +1230,11 @@ onMounted(async () => {
     ElMessage.error('获取节目列表失败')
   }
   
-  // 获取初始数据
+  // 获取初始数据（根据filterDepartmentOnly决定是否按部门筛选）
   await fetchReporters()
   const [year, month] = selectedMonth.value.split('-').map(Number)
-  await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value)
+  const department = filterDepartmentOnly.value && userData.value.department ? userData.value.department : null
+  await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value, department)
   
   // 添加ESC键事件监听器
   document.addEventListener('keydown', handleEscapeKey)
@@ -1207,6 +1278,37 @@ const openAddDialog = () => {
     page_meta_id: 0,
     state: 1,
   })
+  
+  // 根据部门自动选择媒体类型
+  if (hasDepartment.value) {
+    const department = userData.value.department || localStorage.getItem('userDepartment')
+    console.log('当前部门:', department)
+    console.log('可用媒体类型:', programs.value)
+    
+    // 在节目列表中查找名称包含当前部门的节目
+    const defaultProgram = programs.value.find(p => 
+      p.name && p.name.includes(department)
+    )
+    
+    if (defaultProgram) {
+      newsForm.program_id = defaultProgram.site_id
+      newsForm.tv_or_paper = defaultProgram.site_id
+      
+      // 根据节目名称判断媒体类型
+      if (defaultProgram.name.includes('电视')) {
+        newsForm.media_type = 0 // 电视
+      } else if (defaultProgram.name.includes('报纸')) {
+        newsForm.media_type = 1 // 报纸
+      } else if (defaultProgram.name.includes('网络')) {
+        newsForm.media_type = 2 // 网络
+      } else if (defaultProgram.name.includes('新媒体')) {
+        newsForm.media_type = 3 // 新媒体
+      }
+      
+      console.log('自动选择的媒体类型:', defaultProgram)
+    }
+  }
+  
   dialogVisible.value = true
 }
 
@@ -1316,7 +1418,9 @@ const submitForm = async () => {
     
     // 刷新文章列表
     const [year, month] = selectedMonth.value.split('-').map(Number)
-    await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value)
+    // 处理部门筛选
+    const department = filterDepartmentOnly.value && userData.value.department ? userData.value.department : null
+    await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value, department)
     
     ElMessage.success(isEdit.value ? '编辑成功' : '新增成功')
     dialogVisible.value = false
@@ -1339,10 +1443,16 @@ const openTvUrl = (tvUrl, title = '') => {
 // 方法：打开电子报URL
 const openPaperUrl = (paperUrl, title = '') => {
   if (paperUrl) {
-    // 控制电子报弹窗显示
-    currentPaperUrl.value = paperUrl
-    currentPaperTitle.value = title
-    paperDialogVisible.value = true
+    // 手机模式下直接跳转打开，替换URL中的zsrb为app_zsrb
+    if (isMobile.value) {
+      const modifiedUrl = paperUrl.replace(/zsrb/g, 'app_zsrb')
+      window.open(modifiedUrl, '_blank')
+    } else {
+      // PC模式下控制电子报弹窗显示
+      currentPaperUrl.value = paperUrl
+      currentPaperTitle.value = title
+      paperDialogVisible.value = true
+    }
   }
 }
 
@@ -1460,7 +1570,9 @@ const deleteArticle = async (row) => {
     
     // 刷新文章列表
     const [year, month] = selectedMonth.value.split('-').map(Number)
-    await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value)
+    // 处理部门筛选
+    const department = filterDepartmentOnly.value && userData.value.department ? userData.value.department : null
+    await fetchArticles(year, month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value, department)
     
     ElMessage.success('文章删除成功')
   } catch (err) {
@@ -1481,7 +1593,9 @@ const changeMonth = async (val) => {
   month.value = val
   currentPage.value = 1 // 切换月份时，回到第一页
   const [year, this_month] = val.split('-').map(Number)
-  await fetchArticles(year, this_month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value)
+  // 处理部门筛选
+  const department = filterDepartmentOnly.value && userData.value.department ? userData.value.department : null
+  await fetchArticles(year, this_month, currentPage.value, pageSize.value, searchKeyword.value, filterReporterId.value > 0 ? filterReporterId.value : null, filterMediaType.value > 0 ? parseInt(filterMediaType.value) : null, filterCorrespondent.value, department)
   ElMessage.success(`已切换至${val}月份`)
 }
 </script>
@@ -1497,7 +1611,33 @@ const changeMonth = async (val) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+}
+
+/* 蓝色边框按钮样式 */
+:deep(.add-news-button) {
+  background: #409eff !important;
+  border: 1px solid #409eff !important;
+  color: white !important;
+  font-weight: normal !important;
+  padding: 10px 20px !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+:deep(.add-news-button:hover) {
+  background: #66b1ff !important;
+  border-color: #66b1ff !important;
+  box-shadow: 0 3px 12px rgba(64, 158, 255, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+:deep(.add-news-button:active) {
+  background: #337ecc !important;
+  border-color: #337ecc !important;
+  transform: translateY(0) !important;
+  box-shadow: 0 1px 6px rgba(64, 158, 255, 0.2) !important;
 }
 
 .header-actions {
@@ -1508,9 +1648,10 @@ const changeMonth = async (val) => {
 .filter-section {
   display: flex;
   align-items: center;
-  padding: 10px;
+  padding: 8px;
   background: #f5f5f5;
   border-radius: 4px;
+  margin-top: 5px;
 }
 
 .filter-label {
@@ -1523,6 +1664,14 @@ const changeMonth = async (val) => {
 .reporter-item {
   display: flex;
   align-items: center;
+  margin-bottom: 10px;
+}
+
+/* 无记者时的样式 */
+.no-reporter {
+  color: #f56c6c;
+  font-weight: bold;
+  font-size: 14px;
   margin-bottom: 10px;
 }
 
@@ -2020,10 +2169,10 @@ const changeMonth = async (val) => {
   .filter-section {
     display: flex !important;
     flex-direction: row !important;
-    flex-wrap: nowrap !important;
+    flex-wrap: wrap !important;
     align-items: center !important;
-    gap: 2px !important;
-    padding: 5px !important;
+    gap: 5px !important;
+    padding: 8px !important;
     width: 100% !important;
   }
   
@@ -2032,33 +2181,59 @@ const changeMonth = async (val) => {
     display: none !important;
   }
   
-  /* 只显示搜索框、媒体选择和查询按钮 */
-  .filter-section > *:not(.el-input):not(.el-select:nth-child(4)):not(.el-button) {
-    display: none !important;
+  /* 移动端筛选区域中，当有部门时显示仅本部门复选框 */
+  @media (max-width: 768px) {
+    .filter-section .el-checkbox {
+      /* 当有部门时，显示仅本部门复选框，隐藏通讯员复选框 */
+      &:not(:nth-last-child(3)) {
+        display: none !important;
+      }
+      
+      &:nth-last-child(3) {
+        display: flex !important;
+        align-items: center !important;
+        margin-right: 5px !important;
+      }
+    }
   }
   
   /* 搜索框占主要宽度 */
   .filter-section .el-input {
-    flex: 1 !important;
-    min-width: 120px !important;
-    margin-right: 2px !important;
+    flex: 1 1 100% !important;
+    min-width: 100% !important;
+    margin-right: 0 !important;
   }
   
-  /* 媒体选择固定宽度 */
+  /* 第二行：媒体选择 + 记者选择 + 查询按钮 */
+  .filter-section > *:nth-child(n+4):nth-child(-n+7) {
+    flex: 1 1 auto !important;
+  }
+  
+  /* 媒体选择 */
   .filter-section .el-select:nth-child(4) {
-    flex: 0 0 100px !important;
-    margin-right: 2px !important;
+    flex: 1 1 120px !important;
+    min-width: 120px !important;
+    margin-right: 5px !important;
   }
   
-  /* 查询按钮固定宽度 */
+  /* 记者选择 */
+  .filter-section .el-select:nth-child(6) {
+    flex: 1 1 120px !important;
+    min-width: 120px !important;
+    margin-right: 5px !important;
+  }
+  
+  /* 查询按钮 */
   .filter-section .el-button {
     flex: 0 0 60px !important;
-    background-color: #409eff !important;
-    color: #ffffff !important;
-    border: 1px solid #409eff !important;
+    width: 60px !important;
     height: 30px !important;
     font-size: 12px !important;
     padding: 0 !important;
+    margin-top: 0 !important;
+    background-color: #409eff !important;
+    color: #ffffff !important;
+    border: 1px solid #409eff !important;
   }
   
   /* 调整输入框和选择器样式 */
@@ -2094,6 +2269,20 @@ const changeMonth = async (val) => {
   }
 }
 
+/* 总条数显示样式 */
+.total-count-container {
+  margin-top: 20px;
+  text-align: right;
+  padding: 10px 0;
+  color: #606266;
+  font-size: 14px;
+}
+
+.total-count {
+  font-weight: bold;
+  color: #409eff;
+}
+
 /* 新闻列表容器样式 */
 .news-list-container {
   margin-top: 20px;
@@ -2111,7 +2300,8 @@ const changeMonth = async (val) => {
   .header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 8px;
+    margin-bottom: 8px;
   }
   
   .header-actions {
