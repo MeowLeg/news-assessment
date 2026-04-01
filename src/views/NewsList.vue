@@ -224,6 +224,15 @@
       </el-select>
       <el-checkbox v-if="!hasDepartment" v-model="filterCorrespondent" style="margin-right: 10px" :disabled="filterDepartmentOnly">通讯员</el-checkbox>
       <el-checkbox v-if="hasDepartment" v-model="filterDepartmentOnly" style="margin-right: 10px; display: none;">仅本部门</el-checkbox>
+      <el-select 
+        v-if="hasDepartment"
+        v-model="sortType"
+        placeholder="排序方式"
+        style="width: 150px; margin-right: 10px"
+      >
+        <el-option label="按时间排序" value="time" />
+        <el-option label="按人名排序" value="name" />
+      </el-select>
       <el-button type="primary" icon="Search" @click="handleSearch">查询</el-button>
     </div>
 
@@ -232,7 +241,7 @@
       <!-- 桌面端表格 -->
       <el-table
         v-loading="loading"
-        :data="newsList"
+        :data="sortedNewsList"
         border
         stripe
         style="width: 100%; flex: 1"
@@ -353,7 +362,7 @@
           <div v-else>暂无数据</div>
         </div>
         <div 
-          v-for="(item, index) in newsList" 
+          v-for="(item, index) in sortedNewsList" 
           :key="item.id" 
           class="mobile-card"
           @click="openMobileDetail(item)"
@@ -454,7 +463,7 @@
           </el-form-item>
           <!-- 文字记者 -->
           <el-form-item label="文字记者">
-            <div v-if="newsForm.textReporters.length === 0" class="no-reporter">无</div>
+            <div v-if="newsForm.textReporters.length === 0" class="no-reporter"></div>
             <div v-else v-for="(reporter, index) in newsForm.textReporters" :key="'text-' + index" class="reporter-item">
               <el-input 
                 v-model="reporter.reporter_name" 
@@ -477,14 +486,23 @@
                 @click="removeReporter('text', index)"
               >删除</el-button>
             </div>
-            <el-button type="primary" size="small" @click="addReporter('text')" style="margin-top: 10px;">
-              <el-icon><Plus /></el-icon> 添加文字记者
-            </el-button>
+            <div class="reporter-add-wrapper">
+              <el-button 
+                class="reporter-add-btn text-reporter-btn" 
+                type="info" 
+                plain 
+                size="small" 
+                @click="addReporter('text')">
+                <el-icon class="reporter-icon"><UserFilled /></el-icon>
+                <span class="btn-text">添加文字记者</span>
+                <el-icon class="plus-icon"><Plus /></el-icon>
+              </el-button>
+            </div>
           </el-form-item>
           
           <!-- 摄影记者 -->
           <el-form-item label="摄影记者">
-            <div v-if="newsForm.photoReporters.length === 0" class="no-reporter">无</div>
+            <div v-if="newsForm.photoReporters.length === 0" class="no-reporter"></div>
             <div v-else v-for="(reporter, index) in newsForm.photoReporters" :key="'photo-' + index" class="reporter-item">
               <el-input 
                 v-model="reporter.reporter_name" 
@@ -507,14 +525,23 @@
                 @click="removeReporter('photo', index)"
               >删除</el-button>
             </div>
-            <el-button type="primary" size="small" @click="addReporter('photo')" style="margin-top: 10px;">
-              <el-icon><Plus /></el-icon> 添加摄影记者
-            </el-button>
+            <div class="reporter-add-wrapper">
+              <el-button 
+                class="reporter-add-btn photo-reporter-btn" 
+                type="success" 
+                plain 
+                size="small" 
+                @click="addReporter('photo')">
+                <el-icon class="reporter-icon"><Camera /></el-icon>
+                <span class="btn-text">添加摄影记者</span>
+                <el-icon class="plus-icon"><Plus /></el-icon>
+              </el-button>
+            </div>
           </el-form-item>
           
           <!-- 通讯员 -->
           <el-form-item label="通讯员">
-            <div v-if="newsForm.correspondentReporters.length === 0" class="no-reporter">无</div>
+            <div v-if="newsForm.correspondentReporters.length === 0" class="no-reporter"></div>
             <div v-else v-for="(reporter, index) in newsForm.correspondentReporters" :key="'correspondent-' + index" class="reporter-item">
               <el-input 
                 v-model="reporter.reporter_name" 
@@ -530,18 +557,27 @@
                 style="width: 120px; margin-right: 10px;"
                 :disabled="!reporters.some(r => r.name === reporter.reporter_name)"
               />
+               <el-button 
+                 v-if="!hasDepartment"
+                 type="warning" 
+                 size="small" 
+                 @click="removeReporter('correspondent', index)"
+               >删除</el-button>
+             </div>
+            <div v-if="!hasDepartment" class="reporter-add-wrapper">
               <el-button 
-                v-if="!hasDepartment"
+                class="reporter-add-btn correspondent-reporter-btn" 
                 type="warning" 
+                plain 
                 size="small" 
-                @click="removeReporter('correspondent', index)"
-              >删除</el-button>
+                @click="addReporter('correspondent')">
+                <el-icon class="reporter-icon"><Document /></el-icon>
+                <span class="btn-text">添加通讯员</span>
+                <el-icon class="plus-icon"><Plus /></el-icon>
+              </el-button>
             </div>
-            <el-button v-if="!hasDepartment" type="primary" size="small" @click="addReporter('correspondent')" style="margin-top: 10px;">
-              <el-icon><Plus /></el-icon> 添加通讯员
-            </el-button>
-          </el-form-item>
-          <el-form-item v-if="!hasDepartment" label="媒体类型" prop="program_id">
+           </el-form-item>
+           <el-form-item v-if="!hasDepartment" label="媒体类型" prop="program_id">
             <el-select
               v-model="newsForm.program_id"
               placeholder="请选择媒体类型"
@@ -622,7 +658,7 @@
           </el-form-item>
           <!-- 文字记者 -->
           <el-form-item label="文字记者">
-            <div v-if="newsForm.textReporters.length === 0" class="no-reporter">无</div>
+            <div v-if="newsForm.textReporters.length === 0" class="no-reporter"></div>
             <div v-else v-for="(reporter, index) in newsForm.textReporters" :key="'text-' + index" class="mobile-reporter-item">
               <el-input 
                 v-model="reporter.reporter_name" 
@@ -643,16 +679,25 @@
                   size="small" 
                   @click="removeReporter('text', index)"
                 >删除</el-button>
-              </div>
+               </div>
+             </div>
+            <div v-if="!hasDepartment" class="reporter-add-wrapper">
+              <el-button 
+                class="reporter-add-btn text-reporter-btn" 
+                type="info" 
+                plain 
+                size="small" 
+                @click="addReporter('text')">
+                <el-icon class="reporter-icon"><UserFilled /></el-icon>
+                <span class="btn-text">添加文字记者</span>
+                <el-icon class="plus-icon"><Plus /></el-icon>
+              </el-button>
             </div>
-            <el-button v-if="!hasDepartment" type="primary" size="small" @click="addReporter('text')" style="margin-top: 10px;">
-              <el-icon><Plus /></el-icon> 添加文字记者
-            </el-button>
-          </el-form-item>
-          
-          <!-- 摄影记者 -->
+           </el-form-item>
+           
+           <!-- 摄影记者 -->
           <el-form-item label="摄影记者">
-            <div v-if="newsForm.photoReporters.length === 0" class="no-reporter">无</div>
+            <div v-if="newsForm.photoReporters.length === 0" class="no-reporter"></div>
             <div v-else v-for="(reporter, index) in newsForm.photoReporters" :key="'photo-' + index" class="mobile-reporter-item">
               <el-input 
                 v-model="reporter.reporter_name" 
@@ -673,16 +718,25 @@
                   size="small" 
                   @click="removeReporter('photo', index)"
                 >删除</el-button>
-              </div>
+               </div>
+             </div>
+            <div v-if="!hasDepartment" class="reporter-add-wrapper">
+              <el-button 
+                class="reporter-add-btn photo-reporter-btn" 
+                type="success" 
+                plain 
+                size="small" 
+                @click="addReporter('photo')">
+                <el-icon class="reporter-icon"><Camera /></el-icon>
+                <span class="btn-text">添加摄影记者</span>
+                <el-icon class="plus-icon"><Plus /></el-icon>
+              </el-button>
             </div>
-            <el-button v-if="!hasDepartment" type="primary" size="small" @click="addReporter('photo')" style="margin-top: 10px;">
-              <el-icon><Plus /></el-icon> 添加摄影记者
-            </el-button>
-          </el-form-item>
-          
-          <!-- 通讯员 -->
+           </el-form-item>
+           
+           <!-- 通讯员 -->
           <el-form-item label="通讯员">
-            <div v-if="newsForm.correspondentReporters.length === 0" class="no-reporter">无</div>
+            <div v-if="newsForm.correspondentReporters.length === 0" class="no-reporter"></div>
             <div v-else v-for="(reporter, index) in newsForm.correspondentReporters" :key="'correspondent-' + index" class="mobile-reporter-item">
               <el-input 
                 v-model="reporter.reporter_name" 
@@ -703,13 +757,22 @@
                   size="small" 
                   @click="removeReporter('correspondent', index)"
                 >删除</el-button>
-              </div>
+               </div>
+             </div>
+            <div v-if="!hasDepartment" class="reporter-add-wrapper">
+              <el-button 
+                class="reporter-add-btn correspondent-reporter-btn" 
+                type="warning" 
+                plain 
+                size="small" 
+                @click="addReporter('correspondent')">
+                <el-icon class="reporter-icon"><Document /></el-icon>
+                <span class="btn-text">添加通讯员</span>
+                <el-icon class="plus-icon"><Plus /></el-icon>
+              </el-button>
             </div>
-            <el-button v-if="!hasDepartment" type="primary" size="small" @click="addReporter('correspondent')" style="margin-top: 10px;">
-              <el-icon><Plus /></el-icon> 添加通讯员
-            </el-button>
-          </el-form-item>
-          <el-form-item v-if="!hasDepartment" label="媒体类型" prop="program_id">
+           </el-form-item>
+           <el-form-item v-if="!hasDepartment" label="媒体类型" prop="program_id">
             <el-select
               v-model="newsForm.program_id"
               placeholder="请选择媒体类型"
@@ -799,6 +862,9 @@ const filterReporterId = ref('0') // 0 表示全部记者
 const filterMediaType = ref('0') // 0 表示全部媒体
 const filterCorrespondent = ref(false) // 是否只显示通讯员
 const filterDepartmentOnly = ref(false) // 是否仅显示本部门
+
+// 排序方式
+const sortType = ref('name') // 'time' 按时间排序, 'name' 按人名排序
 
 // 监听filterDepartmentOnly变化，清空并禁用其他搜索字段
 watch(filterDepartmentOnly, (newVal) => {
@@ -1127,9 +1193,20 @@ const filteredNewsList = computed(() => {
   return list
 })
 
+// 排序后的新闻列表
+const sortedNewsList = computed(() => {
+  const list = [...filteredNewsList.value]
+  if (sortType.value === 'time') {
+    return list.sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate) )
+  }
+  // 按人名排序：保持默认顺序
+  return list
+})
+
 // 处理搜索和筛选
 const handleSearch = async () => {
   currentPage.value = 1 // 搜索时回到第一页
+  sortType.value = 'name' // 搜索时自动切换为按人名排序
   // 重新获取数据，将搜索关键词和筛选条件传递给后端
   const [year, month] = selectedMonth.value.split('-').map(Number)
   // 处理部门筛选
@@ -1513,7 +1590,7 @@ const handlePaperDialogClose = () => {
 // 方法：导出Excel
 const exportToExcel = () => {
   // 准备导出数据
-  const exportData = newsList.value.map(item => ({
+  const exportData = sortedNewsList.value.map(item => ({
     '新闻标题': item.title,
     '发布日期': item.publishDate,
     '文字记者': item.textReporter,
@@ -2764,5 +2841,109 @@ const changeMonth = async (val) => {
   .el-dialog__wrapper {
     width: 100% !important;
   }
-} 
+}
+
+/* 记者添加按钮容器 */
+.reporter-add-wrapper {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+}
+
+/* 记者添加按钮基础样式 */
+.reporter-add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 1.5px solid !important;
+  cursor: pointer;
+  height: 32px;
+}
+
+.reporter-add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.reporter-add-btn:active {
+  transform: translateY(0);
+}
+
+/* 按钮图标样式 */
+.reporter-add-btn .reporter-icon {
+  font-size: 15px;
+  margin-right: 2px;
+}
+
+.reporter-add-btn .plus-icon {
+  font-size: 14px;
+  margin-left: 2px;
+}
+
+.reporter-add-btn .btn-text {
+  font-weight: 500;
+}
+
+/* 文字记者按钮 - 蓝色主题 */
+.text-reporter-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea !important;
+  color: #fff !important;
+}
+
+.text-reporter-btn:hover {
+  background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
+  border-color: #5a6fd6 !important;
+}
+
+/* 摄影记者按钮 - 绿色主题 */
+.photo-reporter-btn {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  border-color: #11998e !important;
+  color: #fff !important;
+}
+
+.photo-reporter-btn:hover {
+  background: linear-gradient(135deg, #0e8279 0%, #2dd46b 100%);
+  border-color: #0e8279 !important;
+}
+
+/* 通讯员按钮 - 橙色主题 */
+.correspondent-reporter-btn {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border-color: #f093fb !important;
+  color: #fff !important;
+}
+
+.correspondent-reporter-btn:hover {
+  background: linear-gradient(135deg, #e07ce8 0%, #e04a5d 100%);
+  border-color: #e07ce8 !important;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .reporter-add-wrapper {
+    margin-top: 6px;
+  }
+  
+  .reporter-add-btn {
+    font-size: 12px;
+    padding: 5px 12px;
+    height: 28px;
+  }
+  
+  .reporter-add-btn .reporter-icon {
+    font-size: 13px;
+  }
+  
+  .reporter-add-btn .plus-icon {
+    font-size: 12px;
+  }
+}
 </style>
