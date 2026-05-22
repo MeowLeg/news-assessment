@@ -75,10 +75,10 @@ const api = {
 
   // 获取文章列表（带分页）
   getArticles(params = {}) {
-    // 默认参数：year=2025，month=12
+    // 默认参数：使用当前年月
     const defaultParams = {
-      year: 2025,
-      month: 12,
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1,
       page: 1,
       limit: 10
     }
@@ -87,20 +87,20 @@ const api = {
 
   // 获取记者业务得分
   getReporterEvents(params = {}) {
-    // 默认参数：year=2025，month=12
+    // 默认参数：使用当前年月
     const defaultParams = {
-      year: 2025,
-      month: 12
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1
     }
     return apiClient.get('/zscmscore/get_reporter_events', { params: { ...defaultParams, ...params } })
   },
 
   // 获取记者阅读总分列表
   calcMonthly(params = {}) {
-    // 默认参数：year=2025，month=12
+    // 默认参数：使用当前年月
     const defaultParams = {
-      year: 2025,
-      month: 12
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1
     }
     return apiClient.get('/zscmscore/calc_monthly', { params: { ...defaultParams, ...params } })
   },
@@ -117,20 +117,20 @@ const api = {
   
   // 获取记者月度加分信息
   getMonthlyAddScore(params = {}) {
-    // 默认参数：year=2025，month=12
+    // 默认参数：使用当前年月
     const defaultParams = {
-      year: 2025,
-      month: 12
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1
     }
     return apiClient.get('/zscmscore/get_monthly_add_score', { params: { ...defaultParams, ...params } })
   },
 
   // 获取记者月度减分信息
   getMonthlySubScore(params = {}) {
-    // 默认参数：year=2025，month=12
+    // 默认参数：使用当前年月
     const defaultParams = {
-      year: 2025,
-      month: 12
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1
     }
     return apiClient.get('/zscmscore/get_monthly_sub_score', { params: { ...defaultParams, ...params } })
   },
@@ -183,6 +183,15 @@ const api = {
   // 获取节目列表
   getPrograms() {
     return apiClient.get('/zscmscore/get_programs')
+  },
+
+  // 获取非本部门稿件（异常稿件）
+  getPaperAbnormalArticles(params = {}) {
+    const defaultParams = {
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1
+    }
+    return apiClient.get('/zscmscore/get_paper_abnormal_articles', { params: { ...defaultParams, ...params } })
   }
 }
 

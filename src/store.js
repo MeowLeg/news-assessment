@@ -53,7 +53,7 @@ export const fetchArticles = async (year = 2025, month = 12, page = 1, limit = 2
           (prev, curr) => prev + ", " + curr.reporter_name + curr.score + '分'
         ) : ''
         return {
-          id: article.id ? article.id.toString() : Math.random().toString(36).substr(2, 9),
+            id: article.id ? article.id.toString() : `${year}-${month}-${Math.floor(Math.random() * 10000)}`,
           title: article.title || article.article_title || '未命名文章',
           publishDate: article.publishDate || article.date || `${year}-${String(month).padStart(2, '0')}-01`,
           textReporter,
@@ -140,7 +140,7 @@ export const fetchArticles = async (year = 2025, month = 12, page = 1, limit = 2
             const scoreAction = article.score_action || article.executeScore || article.execute_score || 0
             
             const transformedArticle = {
-              id: article.id ? article.id.toString() : Math.random().toString(36).substr(2, 9),
+          id: article.id ? article.id.toString() : `${year}-${month}-${Math.floor(Math.random() * 10000)}`,
               title: article.title || article.article_title || '未命名文章',
               publishDate: article.publishDate || article.date || `${article.publish_year || year}-${String(article.publish_month || month).padStart(2, '0')}-${String(article.publish_day || 1).padStart(2, '0')}`,
               textReporter: textReporter,
@@ -180,7 +180,7 @@ export const fetchArticles = async (year = 2025, month = 12, page = 1, limit = 2
         const articles = response.data || response
         if (Array.isArray(articles)) {
           newsList.value = articles.map(article => ({
-            id: article.id ? article.id.toString() : Math.random().toString(36).substr(2, 9),
+              id: article.id ? article.id.toString() : `${year}-${month}-${Math.floor(Math.random() * 10000)}`,
             title: article.title || article.article_title || '未命名文章',
             publishDate: article.publishDate || article.date || `${year}-${String(month).padStart(2, '0')}-01`,
             textReporter: article.reporter || article.journalist || article.author || '未知记者',
@@ -285,6 +285,88 @@ export const fetchReporterMonthlyStats = async (year = 2025, month = 12) => {
   } catch (err) {
     error.value = '获取记者月度统计失败'
     console.error('获取记者月度统计失败:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 获取非本部门稿件（异常稿件）
+export const fetchAbnormalArticles = async (year = 2025, month = 12) => {
+  loading.value = true
+  error.value = null
+  try {
+    const response = await api.getPaperAbnormalArticles({ year, month })
+    
+    // 兼容不同响应格式
+    let articles = []
+    
+    if (Array.isArray(response)) {
+      articles = response
+    } else if (response && typeof response === 'object') {
+      if (response.success) {
+        articles = response.data?.articles || response.articles || response.data || []
+      } else {
+        articles = response.data || response
+      }
+    }
+    
+    if (!Array.isArray(articles)) {
+      articles = []
+    }
+    
+    newsList.value = articles.map(article => {
+      const textReporter = article.reporter_scores && article.reporter_scores.length > 0 ? article.reporter_scores.filter(
+        score => score.reporter_category_id === 3
+      ).reduce(
+        (prev, curr) => (prev ? prev + ', ' : '') + curr.reporter_name + curr.score + '分', ''
+      ) : ''
+      const photoReporter = article.reporter_scores && article.reporter_scores.length > 0 ? article.reporter_scores.filter(
+        score => score.reporter_category_id === 4 || score.reporter_category_id === 5
+      ).reduce(
+        (prev, curr) => (prev ? prev + ', ' : '') + curr.reporter_name + curr.score + '分', ''
+      ) : ''
+      const correspondentReporters = article.reporter_scores && article.reporter_scores.length > 0 ? article.reporter_scores.filter(
+        score => score.reporter_category_id === 7
+      ).reduce(
+        (prev, curr) => (prev ? prev + ', ' : '') + curr.reporter_name + curr.score + '分', ''
+      ) : ''
+      
+      const scoreBasic = article.score_basic || article.baseScore || article.base_score || 0
+      const scoreAction = article.score_action || article.executeScore || article.execute_score || 0
+      
+      return {
+        id: article.id ? article.id.toString() : `${year}-${month}-${Math.floor(Math.random() * 10000)}`,
+        title: article.title || article.article_title || '未命名文章',
+        publishDate: article.publishDate || article.date || `${article.publish_year || year}-${String(article.publish_month || month).padStart(2, '0')}-${String(article.publish_day || 1).padStart(2, '0')}`,
+        textReporter: textReporter,
+        photoReporter: photoReporter,
+        correspondentReporter: correspondentReporters,
+        baseScore: typeof scoreBasic === 'number' ? Math.round(scoreBasic) : 0,
+        executeScore: typeof scoreAction === 'number' ? Math.round(scoreAction) : 0,
+        bonus: 0,
+        penalty: 0,
+        totalScore: typeof scoreBasic === 'number' && typeof scoreAction === 'number' ? Math.round(scoreBasic + scoreAction) : 0,
+        tv_url: article.tv_url || article.tvUrl || '',
+        reporter_scores: article.reporter_scores || [],
+        tv_or_paper: article.tv_or_paper,
+        program_id: article.tv_or_paper,
+        media_type: article.media_type,
+        program_name: article.program_name || '',
+        paper_url: article.paper_url,
+        page_name: article.page_name,
+        page_meta_id: article.page_meta_id,
+        state: article.state,
+        html_content: article.html_content || '',
+        character_count: article.character_count || 0,
+      }
+    })
+    
+    totalArticles.value = newsList.value.length
+  } catch (err) {
+    error.value = '获取非本部门稿件失败: ' + (err.message || err)
+    console.error('获取非本部门稿件失败:', err)
+    newsList.value = []
+    totalArticles.value = 0
   } finally {
     loading.value = false
   }

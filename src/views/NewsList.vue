@@ -2946,4 +2946,13 @@ const changeMonth = async (val) => {
     font-size: 12px;
   }
 }
-</style>
+
+/* Fix for button state persistence in tables after dialog close */
+.el-table .el-button:focus,
+.el-table .el-button:active {
+  background: #409eff !important;
+  border: 1px solid #409eff !important;
+  color: white !important;
+  transform: none !important;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3) !important;
+}</style>
