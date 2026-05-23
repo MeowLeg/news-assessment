@@ -13,13 +13,17 @@
           text-color="#fff"
           active-text-color="#ffd04b"
         >
-          <el-menu-item index="/">
+          <el-menu-item index="/" v-if="hasDepartment">
+            <el-icon><DataAnalysis /></el-icon>
+            记者打分
+          </el-menu-item>
+          <el-menu-item index="/abnormal-score" v-if="hasDepartment">
+            <el-icon><Warning /></el-icon>
+            非3部门打分
+          </el-menu-item>
+          <el-menu-item index="/news-list" v-if="!hasDepartment">
             <el-icon><List /></el-icon>
             文章列表
-          </el-menu-item>
-          <el-menu-item index="/reporter-stats">
-            <el-icon><DataAnalysis /></el-icon>
-            记者统计
           </el-menu-item>
         </el-menu>
         <div class="header-right">
@@ -44,8 +48,8 @@
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { List, DataAnalysis, SwitchButton } from '@element-plus/icons-vue'
-import { isLoggedIn, userData, username } from './store'
+import { List, DataAnalysis, SwitchButton, Warning } from '@element-plus/icons-vue'
+import { isLoggedIn, userData, username, hasDepartment } from './store'
 
 const route = useRoute()
 const router = useRouter()
@@ -175,7 +179,7 @@ body {
     margin-right: 10px;
   }
   
-  /* 隐藏文章列表和记者统计菜单 */
+  /* 隐藏文章列表和记者打分菜单 */
   .el-menu-demo {
     display: none !important;
   }

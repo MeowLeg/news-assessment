@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import NewsList from './views/NewsList.vue'
 import ReporterStats from './views/ReporterStats.vue'
 import Login from './views/Login.vue'
+import AbnormalScore from './views/AbnormalScore.vue'
 import { isLoggedIn as storeIsLoggedIn } from './store'
 
 const routes = [
@@ -13,14 +14,20 @@ const routes = [
   },
   {
     path: '/',
+    name: 'ReporterStats',
+    component: ReporterStats,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/news-list',
     name: 'NewsList',
     component: NewsList,
     meta: { requiresAuth: true }
   },
   {
-    path: '/reporter-stats',
-    name: 'ReporterStats',
-    component: ReporterStats,
+    path: '/abnormal-score',
+    name: 'AbnormalScore',
+    component: AbnormalScore,
     meta: { requiresAuth: true }
   }
 ]
@@ -41,13 +48,55 @@ router.beforeEach((to, from, next) => {
   if (requiresAuth && !isLoggedIn) {
     // 需要认证但未登录，重定向到登录页
     next('/login')
-  } else if (to.path === '/login' && isLoggedIn) {
-    // 已登录但访问登录页，重定向到首页
-    next('/')
-  } else {
-    // 其他情况，正常访问
-    next()
+    return
   }
+  
+  if (to.path === '/login' && isLoggedIn) {
+    // 已登录但访问登录页，根据 department 重定向
+    const savedUserData = localStorage.getItem('userData')
+    let hasDept = false
+    if (savedUserData) {
+      try {
+        const parsed = JSON.parse(savedUserData)
+        hasDept = !!parsed.department
+      } catch (e) { /* ignore */ }
+    }
+    next(hasDept ? '/' : '/news-list')
+    return
+  }
+
+  // 已登录用户的页面访问控制
+  if (isLoggedIn) {
+    const savedUserData = localStorage.getItem('userData')
+    let hasDept = false
+    if (savedUserData) {
+      try {
+        const parsed = JSON.parse(savedUserData)
+        hasDept = !!parsed.department
+      } catch (e) { /* ignore */ }
+    }
+
+    // 无部门用户访问记者打分页 → 重定向到文章列表
+    if (!hasDept && to.path === '/') {
+      next('/news-list')
+      return
+    }
+
+    // 无部门用户访问非3部门打分 → 重定向到文章列表
+    if (!hasDept && to.path === '/abnormal-score') {
+      next('/news-list')
+      return
+    }
+
+    // 有部门用户访问文章列表页 → 重定向到记者打分页
+    if (hasDept && to.path === '/news-list') {
+      next('/')
+      return
+    }
+  }
+  
+  // 其他情况，正常访问
+  next()
 })
 
 export default router

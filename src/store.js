@@ -12,6 +12,7 @@ export const monthOptions = ref([])
 export const isLoggedIn = ref(false)
 export const userData = ref({})
 export const username = computed(() => userData.value.name || '')
+export const hasDepartment = computed(() => !!userData.value.department)
 
 // 数据状态
 export const newsList = ref([])
@@ -290,6 +291,10 @@ export const fetchReporterMonthlyStats = async (year = 2025, month = 12) => {
   }
 }
 
+// 非3部门稿件数据（独立状态，不污染 newsList）
+export const abnormalArticles = ref([])
+export const abnormalArticlesTotal = ref(0)
+
 // 获取非本部门稿件（异常稿件）
 export const fetchAbnormalArticles = async (year = 2025, month = 12) => {
   loading.value = true
@@ -314,7 +319,7 @@ export const fetchAbnormalArticles = async (year = 2025, month = 12) => {
       articles = []
     }
     
-    newsList.value = articles.map(article => {
+    abnormalArticles.value = articles.map(article => {
       const textReporter = article.reporter_scores && article.reporter_scores.length > 0 ? article.reporter_scores.filter(
         score => score.reporter_category_id === 3
       ).reduce(
@@ -361,12 +366,12 @@ export const fetchAbnormalArticles = async (year = 2025, month = 12) => {
       }
     })
     
-    totalArticles.value = newsList.value.length
+    abnormalArticlesTotal.value = abnormalArticles.value.length
   } catch (err) {
     error.value = '获取非本部门稿件失败: ' + (err.message || err)
     console.error('获取非本部门稿件失败:', err)
-    newsList.value = []
-    totalArticles.value = 0
+    abnormalArticles.value = []
+    abnormalArticlesTotal.value = 0
   } finally {
     loading.value = false
   }
@@ -479,12 +484,12 @@ export const minTotalScore = computed(() => {
   return Math.min(...reporterStats.value.map(item => item.total || 0))
 })
 
-// 记者统计数据
+// 记者打分数据
 export const reporterStats = computed(() => {
   // 优先使用API返回的统计数据
   if (reporterMonthlyStats.value.length > 0) {
     return reporterMonthlyStats.value.map(stat => {
-      // 处理加减分（根据用户反馈，加减分在月度记者统计中）
+      // 处理加减分（根据用户反馈，加减分在月度记者打分中）
       // API返回的stat对象中可能没有bonus和penalty字段，直接使用默认值0
       // const bonus = 0 // 暂时设为0，根据实际API返回调整
       // const penalty = 0 // 暂时设为0，根据实际API返回调整
@@ -498,6 +503,7 @@ export const reporterStats = computed(() => {
         name: stat.name || '未知记者', // 确保有默认值
         phone: stat.phone || '', // 确保有默认值
         department: stat.department || '', // 确保有默认值
+        reporter_category_id: stat.reporter_category_id || 0, // 新增字段
         type: stat.reporter_category_name || '未知类型', // 确保有默认值
         count: stat.article_count || 0, // 如果API返回中有count字段则使用，否则默认为1
         // 新闻得分合计（不包含专项赋分和业务协同）
