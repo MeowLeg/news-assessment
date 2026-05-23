@@ -190,14 +190,13 @@
         v-model="searchKeyword"
         placeholder="搜索新闻标题"
         prefix-icon="Search"
-        :style="{ width: hasDepartment ? '1500px' : '1100px', marginRight: '10px' }"
+        style="width: 350px; margin-right: 10px"
       />
-      <span v-if="!hasDepartment" class="filter-label">媒体：</span>
+      <span class="filter-label">媒体：</span>
       <el-select 
-        v-if="!hasDepartment"
         v-model="filterMediaType"
         placeholder="媒体类型"
-        style="width: 300px; margin-right: 10px"
+        style="width: 180px; margin-right: 10px"
         :disabled="filterDepartmentOnly"
       >
         <el-option label="全部部门" value="0" />
@@ -212,7 +211,7 @@
       <el-select 
         v-model="filterReporterId"
         placeholder="筛选记者"
-        style="width: 300px; margin-right: 10px"
+        style="width: 180px; margin-right: 10px"
       >
         <el-option label="全部记者" value="0" />
         <el-option
@@ -222,10 +221,9 @@
           :value="reporter.id"
         />
       </el-select>
-      <el-checkbox v-if="!hasDepartment" v-model="filterCorrespondent" style="margin-right: 10px" :disabled="filterDepartmentOnly">通讯员</el-checkbox>
-      <el-checkbox v-if="hasDepartment" v-model="filterDepartmentOnly" style="margin-right: 10px; display: none;">仅本部门</el-checkbox>
+      <el-checkbox v-model="filterCorrespondent" style="margin-right: 10px" :disabled="filterDepartmentOnly">通讯员</el-checkbox>
+      <el-checkbox v-model="filterDepartmentOnly" style="margin-right: 10px">仅本部门</el-checkbox>
       <el-select 
-        v-if="hasDepartment"
         v-model="sortType"
         placeholder="排序方式"
         style="width: 150px; margin-right: 10px"

@@ -129,7 +129,7 @@
           </el-col>
         </el-row>
 
-        <!-- 记者统计 -->
+        <!-- 记者打分 -->
         <div style="margin-top: 20px">
           <h4>记者得分统计</h4>
           <el-table :data="reporterStats" border stripe style="width: 100%">
@@ -384,7 +384,7 @@ const minTotalScore = computed(() => {
   return Math.min(...newsList.value.map(item => item.totalScore))
 })
 
-// 记者统计数据
+// 记者打分数据
 const reporterStats = computed(() => {
   const stats = {}
   

@@ -80,7 +80,7 @@ const api = {
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       page: 1,
-      limit: 10
+      limit: 1000
     }
     return apiClient.get('/zscmscore/get_articles', { params: { ...defaultParams, ...params } })
   },
@@ -112,6 +112,11 @@ const api = {
 
   // 给文章打分
   scoreArticle(data) {
+    return apiClient.post('/zscmscore/score', data)
+  },
+
+  // 单人打分（只对一个记者打分）
+  scoreArticleSingle(data) {
     return apiClient.post('/zscmscore/score', data)
   },
   
