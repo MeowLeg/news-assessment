@@ -77,7 +77,7 @@ const submitForm = async () => {
           
           ElMessage.success('登录成功')
           // 根据是否有部门决定跳转目标
-          router.push(response.data?.department ? '/' : '/news-list')
+          router.push({ name: response.data?.department ? 'ReporterStats' : 'NewsList' })
         } else {
           // 登录失败，显示错误信息
           ElMessage.error('登录失败：' + (response.errMsg || '未知错误'))

@@ -85,7 +85,7 @@ const logout = () => {
   
   ElMessage.success('登出成功')
   // 重定向到登录页
-  router.push('/login')
+  router.push({ name: 'Login' })
 }
 
 // 初始化检查登录状态

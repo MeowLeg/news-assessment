@@ -47,7 +47,7 @@ router.beforeEach((to, from, next) => {
   
   if (requiresAuth && !isLoggedIn) {
     // 需要认证但未登录，重定向到登录页
-    next('/login')
+    next({ name: 'Login' })
     return
   }
   
@@ -61,7 +61,7 @@ router.beforeEach((to, from, next) => {
         hasDept = !!parsed.department
       } catch (e) { /* ignore */ }
     }
-    next(hasDept ? '/' : '/news-list')
+    next({ name: hasDept ? 'ReporterStats' : 'NewsList' })
     return
   }
 
@@ -78,19 +78,19 @@ router.beforeEach((to, from, next) => {
 
     // 无部门用户访问记者打分页 → 重定向到文章列表
     if (!hasDept && to.path === '/') {
-      next('/news-list')
+      next({ name: 'NewsList' })
       return
     }
 
     // 无部门用户访问非3部门打分 → 重定向到文章列表
     if (!hasDept && to.path === '/abnormal-score') {
-      next('/news-list')
+      next({ name: 'NewsList' })
       return
     }
 
     // 有部门用户访问文章列表页 → 重定向到记者打分页
     if (hasDept && to.path === '/news-list') {
-      next('/')
+      next({ name: 'ReporterStats' })
       return
     }
   }
