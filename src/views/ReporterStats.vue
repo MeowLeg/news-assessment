@@ -38,7 +38,7 @@
           <el-input-number
             v-model="scoreAdjustForm.score"
             :min="-100"
-            :max="100"
+            :max="1000"
             :precision="0"
             style="width: 100%"
           />
@@ -140,7 +140,7 @@
           <el-input-number
             v-model="specialScoreItemForm.score"
             :min="0"
-            :max="100"
+            :max="1000"
             :precision="0"
             style="width: 100%"
           />
@@ -239,11 +239,11 @@
           <el-input-number
             v-model="articleScoreForm.score"
             :min="0"
-            :max="200"
+            :max="1000"
             :precision="0"
             style="width: 100%"
           />
-          <span style="margin-left: 10px; color: #999;">(0-200分)</span>
+          <span style="margin-left: 10px; color: #999;">(0-1000分)</span>
         </el-form-item>
       </el-form>
       <template #footer>

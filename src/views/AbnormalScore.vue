@@ -96,7 +96,7 @@
           <el-input-number
             v-model="scoreForm.score"
             :min="0"
-            :max="200"
+            :max="1000"
             :precision="0"
             style="width: 100%"
           />

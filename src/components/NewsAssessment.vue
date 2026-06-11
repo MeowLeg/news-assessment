@@ -184,7 +184,7 @@
           <el-input-number
             v-model="newsForm.baseScore"
             :min="0"
-            :max="100"
+            :max="1000"
             :precision="1"
             style="width: 100%"
           />
@@ -193,7 +193,7 @@
           <el-input-number
             v-model="newsForm.executeScore"
             :min="0"
-            :max="50"
+            :max="1000"
             :precision="1"
             style="width: 100%"
           />
@@ -202,7 +202,7 @@
           <el-input-number
             v-model="newsForm.bonus"
             :min="0"
-            :max="20"
+            :max="1000"
             :precision="1"
             style="width: 100%"
           />
@@ -211,7 +211,7 @@
           <el-input-number
             v-model="newsForm.penalty"
             :min="0"
-            :max="20"
+            :max="1000"
             :precision="1"
             style="width: 100%"
           />
